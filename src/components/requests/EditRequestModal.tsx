@@ -17,6 +17,8 @@ import {
   Minus,
   Plus,
   Navigation,
+  ExternalLink,
+  Search,
 } from "lucide-react";
 import { EmergencyRequestData, ResourceType, UrgencyLevel } from "@/types";
 import { toast } from "sonner";
@@ -43,6 +45,8 @@ export function EditRequestModal({
   const [address, setAddress] = useState("");
   const [latitude, setLatitude] = useState(13.0827);
   const [longitude, setLongitude] = useState(80.2707);
+  const [googleMapsInput, setGoogleMapsInput] = useState("");
+  const [isGeocoding, setIsGeocoding] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -76,6 +80,94 @@ export function EditRequestModal({
       );
     }
   };
+
+  const handleOpenGoogleMaps = () => {
+    const query = address ? encodeURIComponent(address) : `${latitude},${longitude}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+    toast.info("Google Maps opened in a new tab", {
+      description: "Find your location, right-click to copy coordinates (or copy URL), then paste below to auto-fill.",
+      duration: 8000,
+    });
+  };
+
+  const handleParseGoogleMapsLocation = async (inputStr: string) => {
+    const trimmed = inputStr.trim();
+    if (!trimmed) return;
+
+    let parsedLat: number | null = null;
+    let parsedLng: number | null = null;
+
+    // 1. Direct coordinates: 13.0827, 80.2707
+    const coordMatch = trimmed.match(/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/);
+    if (coordMatch) {
+      parsedLat = parseFloat(coordMatch[1]);
+      parsedLng = parseFloat(coordMatch[2]);
+    } else {
+      // 2. URL with @lat,lng
+      const atMatch = trimmed.match(/@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/);
+      if (atMatch) {
+        parsedLat = parseFloat(atMatch[1]);
+        parsedLng = parseFloat(atMatch[2]);
+      } else {
+        // 3. Query q=lat,lng
+        const qMatch = trimmed.match(/[?&]q=(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/);
+        if (qMatch) {
+          parsedLat = parseFloat(qMatch[1]);
+          parsedLng = parseFloat(qMatch[2]);
+        }
+      }
+    }
+
+    if (parsedLat !== null && parsedLng !== null) {
+      setLatitude(parseFloat(parsedLat.toFixed(5)));
+      setLongitude(parseFloat(parsedLng.toFixed(5)));
+      setIsGeocoding(true);
+      toast.success("Google Maps Coordinates Extracted", {
+        description: `Latitude: ${parsedLat.toFixed(4)}, Longitude: ${parsedLng.toFixed(4)}. Updating location pin...`,
+      });
+
+      // Try reverse geocoding via OpenStreetMap Nominatim for human address
+      try {
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${parsedLat}&lon=${parsedLng}`,
+          { headers: { "Accept-Language": "en" } }
+        );
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          if (geoData.display_name) {
+            setAddress(geoData.display_name);
+          }
+        }
+      } catch {
+        // Keep existing address if offline
+      } finally {
+        setIsGeocoding(false);
+      }
+    } else {
+      toast.error("Could not extract coordinates", {
+        description: "Please paste a Google Maps link or coordinates formatted as: 13.0827, 80.2707",
+      });
+    }
+  };
+
+  const handleSelectPreset = (preset: { address: string; lat: number; lng: number }) => {
+    setAddress(preset.address);
+    setLatitude(preset.lat);
+    setLongitude(preset.lng);
+    toast.success(`Location set to ${preset.address.split(",")[0]}`);
+  };
+
+  const TN_LOCATION_PRESETS = [
+    { label: "Velachery (Chennai)", address: "14 Velachery Main Rd, Velachery, Chennai", lat: 12.9791, lng: 80.2206 },
+    { label: "Anna Nagar (Chennai)", address: "42 2nd Ave, Anna Nagar, Chennai", lat: 13.0850, lng: 80.2101 },
+    { label: "Porur (Chennai)", address: "Mount Poonamallee Rd, Porur, Chennai", lat: 13.0382, lng: 80.1565 },
+    { label: "OMR (Chennai)", address: "OMR IT Corridor, Sholinganallur, Chennai", lat: 12.9010, lng: 80.2279 },
+    { label: "Coimbatore", address: "Cross Cut Rd, Gandhipuram, Coimbatore", lat: 11.0168, lng: 76.9558 },
+    { label: "Madurai", address: "Goripalayam Junction, Madurai", lat: 9.9252, lng: 78.1198 },
+    { label: "Trichy", address: "Amma Mandapam Rd, Srirangam, Trichy", lat: 10.8622, lng: 78.6948 },
+    { label: "Salem", address: "Junction Main Rd, Suramangalam, Salem", lat: 11.6643, lng: 78.1460 },
+  ];
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -279,28 +371,126 @@ export function EditRequestModal({
           </div>
         </div>
 
-        {/* Delivery Address */}
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-              Street / Neighborhood Address
-            </label>
-            <button
-              type="button"
-              onClick={handleUseCurrentLocation}
-              className="text-[11px] text-blue-600 hover:underline flex items-center gap-1 font-semibold"
-            >
-              <Navigation className="w-3 h-3" />
-              <span>Use Current GPS</span>
-            </button>
+        {/* Delivery Address & Google Maps Selector */}
+        <div className="space-y-3">
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Street / Neighborhood Address
+              </label>
+              {isGeocoding && (
+                <span className="text-[11px] text-blue-600 font-semibold animate-pulse">
+                  Resolving address...
+                </span>
+              )}
+            </div>
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="e.g. 14 Velachery Main Rd, Chennai, Tamil Nadu"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="e.g. 14 Velachery Main Rd, Chennai, Tamil Nadu"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+
+          {/* Quick Tamil Nadu Hotspots */}
+          <div>
+            <span className="text-[10px] font-semibold text-slate-500 block mb-1">
+              Tamil Nadu Hotspot Presets:
+            </span>
+            <div className="flex flex-wrap gap-1">
+              {TN_LOCATION_PRESETS.map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => handleSelectPreset(preset)}
+                  className="text-[10px] px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-slate-200 text-slate-700 font-medium transition-colors cursor-pointer"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Google Maps Actions Card */}
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-red-600" />
+                <span>Google Maps Telemetry</span>
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleOpenGoogleMaps}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-colors cursor-pointer"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Pick on Google Maps</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleUseCurrentLocation}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
+                >
+                  <Navigation className="w-3 h-3 text-blue-600" />
+                  <span>GPS</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Paste Google Maps Link or Coords */}
+            <div className="flex gap-1.5">
+              <div className="relative flex-1">
+                <Search className="w-3 h-3 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
+                <input
+                  type="text"
+                  value={googleMapsInput}
+                  onChange={(e) => setGoogleMapsInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleParseGoogleMapsLocation(googleMapsInput);
+                    }
+                  }}
+                  placeholder="Paste Google Maps URL or coordinates (13.0827, 80.2707)"
+                  className="w-full pl-7 pr-2.5 py-1.5 rounded-md border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-mono"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleParseGoogleMapsLocation(googleMapsInput)}
+                className="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Apply
+              </button>
+            </div>
+
+            {/* Latitude and Longitude */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <span className="text-slate-400 block mb-0.5">Latitude:</span>
+                <input
+                  type="number"
+                  step="0.0001"
+                  value={latitude}
+                  onChange={(e) => setLatitude(parseFloat(e.target.value) || 0)}
+                  className="w-full px-2.5 py-1 bg-white border border-slate-200 rounded-md text-slate-700 font-mono text-xs"
+                />
+              </div>
+              <div>
+                <span className="text-slate-400 block mb-0.5">Longitude:</span>
+                <input
+                  type="number"
+                  step="0.0001"
+                  value={longitude}
+                  onChange={(e) => setLongitude(parseFloat(e.target.value) || 0)}
+                  className="w-full px-2.5 py-1 bg-white border border-slate-200 rounded-md text-slate-700 font-mono text-xs"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Actions */}
