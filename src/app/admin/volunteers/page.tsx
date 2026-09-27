@@ -181,7 +181,7 @@ export default function AdminVolunteersPage() {
                       <div className="space-y-2 py-3 border-t border-b border-slate-100 text-xs text-slate-600 my-3">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                          <span>Location: <strong>{v.address || "San Francisco Bay Area"}</strong></span>
+                          <span>Location: <strong>{v.address || "Tamil Nadu"}</strong></span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Truck className="w-3.5 h-3.5 text-slate-400" />

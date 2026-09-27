@@ -108,7 +108,7 @@ export default function LandingPage() {
               <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 font-medium text-slate-300">
                   <Radio className="w-4 h-4 text-red-500 animate-pulse" />
-                  <span>Tactical Incident Grid • San Francisco Metro Dispatch</span>
+                  <span>Tactical Incident Grid • Tamil Nadu Emergency Dispatch</span>
                 </div>
                 <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono text-[11px] border border-slate-700">
                   Active Dispatch Markers

@@ -83,8 +83,8 @@ export async function POST(req: NextRequest) {
           role,
           phone: phone || null,
           address: address || null,
-          latitude: latitude || 37.7749,
-          longitude: longitude || -122.4194,
+          latitude: latitude || 13.0827,
+          longitude: longitude || 80.2707,
         },
       });
 
@@ -96,8 +96,8 @@ export async function POST(req: NextRequest) {
             isAvailable: true,
             serviceRadiusKm: serviceRadiusKm || 10,
             capabilities: JSON.stringify(capabilities || ["WATER", "FOOD"]),
-            latitude: latitude || 37.7749,
-            longitude: longitude || -122.4194,
+            latitude: latitude || 13.0827,
+            longitude: longitude || 80.2707,
             address: address || null,
             vehicleType: vehicleType || "Car",
             bio: bio || null,

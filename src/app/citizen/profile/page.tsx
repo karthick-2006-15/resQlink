@@ -60,7 +60,7 @@ export default function CitizenProfilePage() {
                   <MapPin className="w-4 h-4 text-slate-400" />
                   <div>
                     <span className="text-slate-400 block text-[10px]">Primary Neighborhood</span>
-                    <span className="font-semibold text-slate-800">{user?.address || "Financial District, San Francisco"}</span>
+                    <span className="font-semibold text-slate-800">{user?.address || "Velachery, Chennai, Tamil Nadu"}</span>
                   </div>
                 </div>
               </div>

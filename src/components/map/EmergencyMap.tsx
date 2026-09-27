@@ -4,8 +4,18 @@ import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { PriorityBadge, ResourceBadge, StatusBadge } from "../ui/Badge";
 import { EmergencyRequestData, ResourceType } from "@/types";
-import { Filter, Navigation, Droplets, Utensils, Car, Home, Package, ExternalLink } from "lucide-react";
+import { Filter, Navigation, Droplets, Utensils, Car, Home, Package, ExternalLink, MapPin } from "lucide-react";
 import Link from "next/link";
+
+export const TAMIL_NADU_REGIONS = [
+  { id: "ALL", name: "Tamil Nadu (All)", center: [11.1271, 78.6569] as [number, number], zoom: 7 },
+  { id: "CHENNAI", name: "Chennai Metro", center: [13.0827, 80.2707] as [number, number], zoom: 11 },
+  { id: "COIMBATORE", name: "Coimbatore", center: [11.0168, 76.9558] as [number, number], zoom: 12 },
+  { id: "MADURAI", name: "Madurai", center: [9.9252, 78.1198] as [number, number], zoom: 12 },
+  { id: "TRICHY", name: "Tiruchirappalli", center: [10.8271, 78.6890] as [number, number], zoom: 12 },
+  { id: "CUDDALORE", name: "Cuddalore Coast", center: [11.7480, 79.7714] as [number, number], zoom: 12 },
+  { id: "SALEM", name: "Salem", center: [11.6643, 78.1460] as [number, number], zoom: 12 },
+];
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -35,8 +45,8 @@ interface EmergencyMapProps {
 
 export function EmergencyMap({
   requests,
-  center = [37.7749, -122.4194],
-  zoom = 13,
+  center = [11.1271, 78.6569], // Tamil Nadu state center
+  zoom = 7,
   height = "550px",
   showFilters = true,
   onSelectRequest,
@@ -45,6 +55,9 @@ export function EmergencyMap({
   const [L, setL] = useState<any>(null);
   const [selectedResource, setSelectedResource] = useState<string>("ALL");
   const [selectedPriority, setSelectedPriority] = useState<string>("ALL");
+  const [selectedRegion, setSelectedRegion] = useState<string>("ALL");
+  const [currentCenter, setCurrentCenter] = useState<[number, number]>(center);
+  const [currentZoom, setCurrentZoom] = useState<number>(zoom);
 
   useEffect(() => {
     setIsClient(true);
@@ -144,6 +157,30 @@ export function EmergencyMap({
             <span>Filter Grid:</span>
           </div>
 
+          {/* District / Region Filter */}
+          <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-md px-1.5 py-0.5">
+            <MapPin className="w-3 h-3 text-red-500" />
+            <select
+              value={selectedRegion}
+              onChange={(e) => {
+                const regId = e.target.value;
+                setSelectedRegion(regId);
+                const reg = TAMIL_NADU_REGIONS.find((r) => r.id === regId);
+                if (reg) {
+                  setCurrentCenter(reg.center);
+                  setCurrentZoom(reg.zoom);
+                }
+              }}
+              className="bg-transparent font-semibold text-slate-800 focus:outline-none text-xs cursor-pointer py-0.5"
+            >
+              {TAMIL_NADU_REGIONS.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Resource Filter */}
           <select
             value={selectedResource}
@@ -179,8 +216,9 @@ export function EmergencyMap({
       {/* Map Container */}
       <div style={{ height }}>
         <MapContainer
-          center={center}
-          zoom={zoom}
+          key={`${currentCenter[0]}-${currentCenter[1]}-${currentZoom}`}
+          center={currentCenter}
+          zoom={currentZoom}
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%" }}
         >

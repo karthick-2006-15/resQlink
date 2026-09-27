@@ -144,7 +144,7 @@ export default function VolunteerDashboard() {
                   </h1>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Location: <span className="font-semibold text-slate-700">{profile?.address || "San Francisco Metro"}</span> • Operational Radius: <span className="font-semibold text-slate-700">{profile?.serviceRadiusKm || 10} km</span>
+                  Location: <span className="font-semibold text-slate-700">{profile?.address || "Chennai, Tamil Nadu"}</span> • Operational Radius: <span className="font-semibold text-slate-700">{profile?.serviceRadiusKm || 10} km</span>
                 </p>
               </div>
 

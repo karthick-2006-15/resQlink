@@ -43,9 +43,9 @@ export function CreateRequestModal({
   const [quantity, setQuantity] = useState("10 packets");
   const [peopleAffected, setPeopleAffected] = useState(4);
   const [urgency, setUrgency] = useState<UrgencyLevel>("HIGH");
-  const [address, setAddress] = useState("742 Montgomery St, San Francisco, CA");
-  const [latitude, setLatitude] = useState(37.7952);
-  const [longitude, setLongitude] = useState(-122.4029);
+  const [address, setAddress] = useState("14 Velachery Main Rd, Chennai, Tamil Nadu");
+  const [latitude, setLatitude] = useState(12.9791);
+  const [longitude, setLongitude] = useState(80.2206);
 
   const resetForm = () => {
     setStep(1);
@@ -322,7 +322,7 @@ export function CreateRequestModal({
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="e.g. 742 Montgomery St, San Francisco, CA"
+                placeholder="e.g. 14 Velachery Main Rd, Chennai, Tamil Nadu"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
