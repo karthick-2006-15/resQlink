@@ -21,6 +21,8 @@ import {
   ChevronRight,
   TrendingUp,
   FileCheck,
+  ChevronDown,
+  HelpCircle,
 } from "lucide-react";
 import { EmergencyRequestData } from "@/types";
 
@@ -32,6 +34,8 @@ export default function LandingPage() {
     avgResponseMinutes: 14.2,
   });
   const [sampleRequests, setSampleRequests] = useState<EmergencyRequestData[]>([]);
+  const [selectedResourceTab, setSelectedResourceTab] = useState("Clean Water");
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/analytics/overview")
@@ -220,37 +224,187 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* SUPPORTED RESOURCE TYPES */}
-        <section className="bg-slate-100/60 border-t border-b border-slate-200 py-14 px-4 sm:px-6 lg:px-8">
+        {/* SUPPORTED RESOURCE TYPES (INTERACTIVE EXPLORER) */}
+        <section className="bg-slate-100/70 border-t border-b border-slate-200 py-14 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="text-center max-w-xl mx-auto mb-8">
-              <h2 className="text-xl font-bold text-slate-900">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                Resource Taxonomy
+              </span>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
                 Coordinated Emergency Resources
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Standardized non-medical emergency supply categories
+                Click any category to inspect deployment specifications and active Tamil Nadu relief hubs
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {/* Interactive Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
               {[
-                { title: "Clean Water", icon: Droplets, count: "Potable gallons, bottles, purification packs" },
-                { title: "Food Supplies", icon: Utensils, count: "Ready meals, infant formula, dry rations" },
-                { title: "Relocation Transport", icon: Car, count: "Non-medical evacuation, high-ground transfer" },
-                { title: "Temporary Shelter", icon: Home, count: "Tarpaulins, emergency tents, blankets, cots" },
-                { title: "General Supplies", icon: Package, count: "Flashlights, hygiene kits, power banks" },
+                { title: "Clean Water", icon: Droplets, count: "Potable cans, bottles, tablets" },
+                { title: "Food Supplies", icon: Utensils, count: "Ready meals, baby formula, rations" },
+                { title: "Relocation Transport", icon: Car, count: "High-ground evacuation shuttles" },
+                { title: "Temporary Shelter", icon: Home, count: "Heavy tarpaulins, cots, tents" },
+                { title: "General Supplies", icon: Package, count: "Powerbanks, torches, hygiene kits" },
               ].map((r) => {
                 const Icon = r.icon;
+                const isSelected = selectedResourceTab === r.title;
+
                 return (
-                  <div key={r.title} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-left">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-700 flex items-center justify-center mb-2.5">
+                  <button
+                    key={r.title}
+                    type="button"
+                    onClick={() => setSelectedResourceTab(r.title)}
+                    className={`p-4 rounded-2xl border text-left transition-all ${
+                      isSelected
+                        ? "bg-white border-blue-600 shadow-md ring-2 ring-blue-500/20"
+                        : "bg-white/80 border-slate-200 hover:border-slate-300 hover:bg-white shadow-sm"
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-2.5 transition-colors ${
+                      isSelected ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"
+                    }`}>
                       <Icon className="w-4 h-4" />
                     </div>
-                    <h4 className="font-bold text-sm text-slate-900">{r.title}</h4>
-                    <p className="text-[11px] text-slate-500 mt-1 leading-snug">{r.count}</p>
-                  </div>
+                    <h4 className="font-bold text-xs sm:text-sm text-slate-900">{r.title}</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-snug line-clamp-1">{r.count}</p>
+                  </button>
                 );
               })}
+            </div>
+
+            {/* Active Resource Details Panel */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 max-w-4xl mx-auto">
+              {selectedResourceTab === "Clean Water" && (
+                <div className="space-y-4 text-xs text-slate-700">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <span className="font-bold text-sm text-slate-900">Potable Drinking Water Logistics</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[11px]">Priority 1 Resource</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Essential drinking water mobilized during municipal pipe ruptures, flood siltation, or disaster zone contamination across Tamil Nadu districts.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Standard Stock</span>
+                      <span className="font-semibold text-slate-800">20L Cans & Halazone Tablets</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Active Response Hubs</span>
+                      <span className="font-semibold text-slate-800">Velachery, Mylapore, Cuddalore</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Protocol SLA</span>
+                      <span className="font-semibold text-emerald-700">Under 30 min critical dispatch</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedResourceTab === "Food Supplies" && (
+                <div className="space-y-4 text-xs text-slate-700">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <span className="font-bold text-sm text-slate-900">Emergency Nutrition & Infant Rations</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold text-[11px]">Sustenance Support</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Nutritious ready-to-eat and dry rations delivered directly to families stranded on high floors or isolated by flooded streets.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Standard Stock</span>
+                      <span className="font-semibold text-slate-800">Ready Meals & Baby Formula</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Active Response Hubs</span>
+                      <span className="font-semibold text-slate-800">Anna Nagar, T. Nagar, Madurai</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Protocol SLA</span>
+                      <span className="font-semibold text-emerald-700">Matched with community kitchens</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedResourceTab === "Relocation Transport" && (
+                <div className="space-y-4 text-xs text-slate-700">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <span className="font-bold text-sm text-slate-900">Non-Medical Evacuation & High-Ground Transfer</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 font-bold text-[11px]">Mobility Fleet</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Coordinated ground evacuation for seniors, families, and residents requiring transfer to government relief shelters.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Vehicle Types</span>
+                      <span className="font-semibold text-slate-800">4x4 SUVs, Cargo Vans, Pickups</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Active Response Hubs</span>
+                      <span className="font-semibold text-slate-800">Tambaram, Porur, Coimbatore</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Protocol SLA</span>
+                      <span className="font-semibold text-emerald-700">ACID reservation guarantees driver</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedResourceTab === "Temporary Shelter" && (
+                <div className="space-y-4 text-xs text-slate-700">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <span className="font-bold text-sm text-slate-900">Weatherproofing & Dry Shelter Supplies</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[11px]">Protection Kits</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Heavy-duty waterproofing tarps, sleeping blankets, and tents to protect displaced citizens whose homes have suffered storm roof damage.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Standard Stock</span>
+                      <span className="font-semibold text-slate-800">20x20 Tarps, Cots, Blankets</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Active Response Hubs</span>
+                      <span className="font-semibold text-slate-800">Guindy, Trichy, Srirangam</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Protocol SLA</span>
+                      <span className="font-semibold text-emerald-700">Prioritized by vulnerability index</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedResourceTab === "General Supplies" && (
+                <div className="space-y-4 text-xs text-slate-700">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <span className="font-bold text-sm text-slate-900">Emergency Power, Illumination & Hygiene</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-[11px]">Hardware & Power</span>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    Prepositioned batteries, torches, and personal hygiene supplies to maintain life safety during prolonged grid outages.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Standard Stock</span>
+                      <span className="font-semibold text-slate-800">Torches, Powerbanks, Sanitation</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Active Response Hubs</span>
+                      <span className="font-semibold text-slate-800">OMR Corridor, Salem, Tirunelveli</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl">
+                      <span className="text-slate-400 block font-bold text-[10px] uppercase">Protocol SLA</span>
+                      <span className="font-semibold text-emerald-700">Pre-staged volunteer inventory</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -321,6 +475,68 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* FREQUENTLY ASKED QUESTIONS (INTERACTIVE ACCORDION) */}
+        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-slate-200">
+          <div className="text-center mb-10">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+              Community FAQ
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+              Emergency Coordination Answers
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-2">
+              Everything you need to know about transactional crisis logistics and volunteer protocols.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              {
+                q: "How does ResQLink verify field volunteers?",
+                a: "Volunteers undergo role-based verification and admin authorization before being permitted to accept dispatches. Only verified responders receive exact delivery coordinates, protecting recipient privacy during crises.",
+              },
+              {
+                q: "What geographic districts in Tamil Nadu are currently covered?",
+                a: "The operational grid currently coordinates verified supplies across Chennai (Velachery, Anna Nagar, Mylapore, Tambaram, OMR, Guindy), Coimbatore, Madurai, Tiruchirappalli (Trichy), Cuddalore, Salem, Thoothukudi, and Tirunelveli.",
+              },
+              {
+                q: "How is dispatch priority computed?",
+                a: "ResQLink utilizes an objective 4-factor scoring algorithm weighting Urgency Level (40%), People Affected & Vulnerability (30%), Resource Criticality (20%), and Request Aging (10%) to output a deterministic priority score between 0 and 100.",
+              },
+              {
+                q: "Does ResQLink handle emergency medical calls?",
+                a: "No. ResQLink strictly coordinates non-medical emergency supplies (clean water, nutrition, high-ground evacuation, shelter, and survival hardware). For medical or fire emergencies, dial 108 or 112 immediately.",
+              },
+            ].map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={idx}
+                  className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="w-full px-5 py-4 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-900 hover:bg-slate-50 transition-colors"
+                  >
+                    <span>{faq.q}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0 ${
+                        isOpen ? "rotate-180 text-blue-600" : ""
+                      }`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className="px-5 pb-4 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
 

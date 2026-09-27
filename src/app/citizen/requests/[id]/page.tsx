@@ -21,9 +21,13 @@ import {
   CheckCircle2,
   Share2,
   Star,
+  Copy,
+  Check,
+  Radio,
 } from "lucide-react";
 import { EmergencyRequestData, AuditLogData } from "@/types";
 import { toast } from "sonner";
+import { CardSkeleton, Skeleton } from "@/components/ui/Skeleton";
 
 export default function RequestTrackingPage() {
   const params = useParams();
@@ -35,6 +39,16 @@ export default function RequestTrackingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.href);
+      setIsCopied(true);
+      toast.success("Incident tracking link copied to clipboard");
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
 
   const fetchDetails = async () => {
     try {
@@ -86,21 +100,52 @@ export default function RequestTrackingPage() {
     }
   };
 
+  const getProgress = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return { percent: 15, label: "Request Logged • Awaiting Admin Verification", color: "bg-amber-500" };
+      case "VERIFIED":
+        return { percent: 35, label: "Verified by Disaster Desk • Matching Nearby Responders", color: "bg-blue-500" };
+      case "ASSIGNED":
+        return { percent: 60, label: "Volunteer Responder Assigned • Preparing Supplies", color: "bg-indigo-500" };
+      case "IN_PROGRESS":
+        return { percent: 80, label: "Responder In Transit • Heading to Coordinates", color: "bg-blue-600" };
+      case "DELIVERED":
+        return { percent: 95, label: "Supplies Handed Over • Confirmation Pending", color: "bg-emerald-500" };
+      case "CONFIRMED":
+      case "CLOSED":
+        return { percent: 100, label: "Mission Completed & Fully Verified", color: "bg-emerald-600" };
+      default:
+        return { percent: 20, label: "Processing Emergency Request", color: "bg-slate-500" };
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col">
+      <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center p-8 text-slate-500">
-          <Clock className="w-6 h-6 animate-spin text-blue-600 mr-2" />
-          <span>Loading live incident telemetry...</span>
-        </div>
+        <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-5 w-32 rounded-lg" />
+            <Skeleton className="h-5 w-40 rounded-lg" />
+          </div>
+          <CardSkeleton />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <CardSkeleton />
+            </div>
+            <div>
+              <CardSkeleton />
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
 
   if (!request) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col">
+      <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
           <AlertCircle className="w-12 h-12 text-slate-300 mb-3" />
@@ -116,14 +161,15 @@ export default function RequestTrackingPage() {
 
   const assignment = request.currentAssignment;
   const volunteer = assignment?.volunteer;
+  const progress = getProgress(request.status);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Navbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-        {/* Back Link */}
-        <div className="mb-6 flex items-center justify-between">
+        {/* Back Link & Quick Actions */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={() => router.back()}
             className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
@@ -132,17 +178,39 @@ export default function RequestTrackingPage() {
             <span>Back to Overview</span>
           </button>
 
-          <span className="text-[11px] font-mono text-slate-400">ID: {request.id}</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCopyLink}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-sm transition-all"
+            >
+              {isCopied ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-emerald-700">Link Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Share Tracking</span>
+                </>
+              )}
+            </button>
+            <span className="text-[11px] font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded-md">ID: {request.id.slice(0, 10)}...</span>
+          </div>
         </div>
 
         {/* Top Status Banner */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-6 border-b border-slate-100">
-            <div>
+            <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap mb-2">
                 <ResourceBadge type={request.resourceType} />
                 <PriorityBadge level={request.priorityLevel} />
                 <StatusBadge status={request.status} />
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full ml-auto sm:ml-0">
+                  <Radio className="w-3 h-3 text-blue-600 animate-pulse" />
+                  <span>Live Telemetry Active</span>
+                </span>
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
@@ -152,6 +220,20 @@ export default function RequestTrackingPage() {
               <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                 {request.description}
               </p>
+
+              {/* Dynamic Live Progress Bar */}
+              <div className="mt-5 space-y-1.5 max-w-xl">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700">{progress.label}</span>
+                  <span className="font-mono text-slate-400 font-semibold">{progress.percent}%</span>
+                </div>
+                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div
+                    className={`${progress.color} h-full transition-all duration-700 rounded-full`}
+                    style={{ width: `${progress.percent}%` }}
+                  />
+                </div>
+              </div>
             </div>
 
             {/* If Delivered -> Trigger Confirm Dialog */}

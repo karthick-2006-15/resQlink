@@ -16,8 +16,10 @@ import {
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
-  Navigation,
   Clock,
+  Minus,
+  Plus,
+  Navigation,
 } from "lucide-react";
 import { ResourceType, UrgencyLevel } from "@/types";
 import { toast } from "sonner";
@@ -133,6 +135,39 @@ export function CreateRequestModal({
       maxWidth="lg"
     >
       <div className="space-y-6">
+        {/* Step Breadcrumbs */}
+        <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1 text-[11px] font-bold">
+          {[
+            { num: 1, label: "Resource" },
+            { num: 2, label: "Scope" },
+            { num: 3, label: "Urgency" },
+            { num: 4, label: "Details" },
+            { num: 5, label: "Location" },
+            { num: 6, label: "Review" },
+          ].map((s) => (
+            <button
+              key={s.num}
+              type="button"
+              onClick={() => {
+                if (s.num < step) setStep(s.num);
+              }}
+              disabled={s.num > step}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all ${
+                step === s.num
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : s.num < step
+                  ? "bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer"
+                  : "bg-slate-100 text-slate-400 cursor-not-allowed"
+              }`}
+            >
+              <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-mono bg-black/10">
+                {s.num < step ? "✓" : s.num}
+              </span>
+              <span className="hidden sm:inline">{s.label}</span>
+            </button>
+          ))}
+        </div>
+
         {/* Progress Bar */}
         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
           <div
@@ -188,25 +223,52 @@ export function CreateRequestModal({
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="e.g. 10 gallons, 8 meal packets, 2 tents"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <p className="text-[11px] text-slate-400 mt-1">
-                Specify exact counts so responders pack correct cargo volume.
-              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-[11px] text-slate-400">Quick suggestions:</span>
+                {["4 units", "10 units", "25 units", "Bulk (50+)"].map((sug) => (
+                  <button
+                    key={sug}
+                    type="button"
+                    onClick={() => setQuantity(sug)}
+                    className="text-[11px] font-semibold px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition-colors"
+                  >
+                    {sug}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                 Number of People Affected
               </label>
-              <input
-                type="number"
-                min="1"
-                max="100"
-                value={peopleAffected}
-                onChange={(e) => setPeopleAffected(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPeopleAffected(Math.max(1, peopleAffected - 1))}
+                  className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold transition-colors"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={peopleAffected}
+                  onChange={(e) => setPeopleAffected(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-24 text-center px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPeopleAffected(Math.min(100, peopleAffected + 1))}
+                  className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+                <span className="text-xs text-slate-500 font-medium">individuals needing assistance</span>
+              </div>
               <p className="text-[11px] text-slate-400 mt-1">
                 Direct input into the objective priority scoring algorithm.
               </p>
