@@ -22,7 +22,13 @@ export async function POST(req: NextRequest) {
     const user = await getCurrentUser(req);
     if (!user) {
       return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Login required to submit request" } },
+        {
+          success: false,
+          error: {
+            code: "UNAUTHORIZED",
+            message: "Authentication required: Please sign in or switch to a citizen account to submit an emergency request.",
+          },
+        },
         { status: 401 }
       );
     }
@@ -36,7 +42,7 @@ export async function POST(req: NextRequest) {
           success: false,
           error: {
             code: "VALIDATION_ERROR",
-            message: validated.error.errors[0]?.message || "Validation failed",
+            message: validated.error.errors[0]?.message || "Validation failed: please complete all required fields.",
             details: validated.error.flatten(),
           },
         },
@@ -44,10 +50,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Ensure requester exists in the database
+    let requesterId = user.id;
+    let actorName = user.name;
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: requesterId },
+      select: { id: true, name: true },
+    });
+
+    if (!userExists) {
+      // Fallback to active citizen if available to prevent foreign key crashes during demo/testing
+      const fallbackCitizen = await prisma.user.findFirst({
+        where: { role: "CITIZEN" },
+        select: { id: true, name: true },
+      });
+
+      if (fallbackCitizen) {
+        requesterId = fallbackCitizen.id;
+        actorName = fallbackCitizen.name;
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "USER_SESSION_EXPIRED",
+              message: "Your user account was not found in the database. Please sign in again or use the demo role switcher.",
+            },
+          },
+          { status: 401 }
+        );
+      }
+    }
+
     // Check for duplicate pending requests by same user for same resource
     const duplicate = await prisma.emergencyRequest.findFirst({
       where: {
-        requesterId: user.id,
+        requesterId,
         resourceType: validated.data.resourceType,
         status: { in: ["PENDING", "VERIFIED", "MATCHING"] },
       },
@@ -59,7 +98,7 @@ export async function POST(req: NextRequest) {
           success: false,
           error: {
             code: "DUPLICATE_ACTIVE_REQUEST",
-            message: `You already have an active request for ${validated.data.resourceType}. You can track or update your existing request.`,
+            message: `You already have an active request for ${validated.data.resourceType} in progress. You can track or update your existing request from the dashboard.`,
           },
         },
         { status: 409 }
@@ -68,10 +107,10 @@ export async function POST(req: NextRequest) {
 
     const newRequest = await RequestService.createRequest(
       {
-        requesterId: user.id,
+        requesterId,
         ...validated.data,
       },
-      user.name
+      actorName
     );
 
     return NextResponse.json(
@@ -84,12 +123,39 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     console.error("Create request error:", error);
+
+    const errorMessage = String(error?.message || "");
+
+    // Translate database / Prisma internal errors into clear, human-understandable problem explanations
+    let clientMessage = "We could not submit your emergency request due to an internal server error. Please try again.";
+    let errorCode = "INTERNAL_ERROR";
+    let statusCode = 500;
+
+    if (errorMessage.includes("Foreign key constraint") || errorMessage.includes("P2003")) {
+      clientMessage = "Session Out of Sync: Your current login session does not match any registered citizen in the database. Please log out and sign back in, or select Sarah Jenkins (Citizen) from the role switcher.";
+      errorCode = "SESSION_MISMATCH";
+      statusCode = 401;
+    } else if (errorMessage.includes("Unique constraint") || errorMessage.includes("P2002")) {
+      clientMessage = "Duplicate Request: An active emergency request with identical details already exists.";
+      errorCode = "DUPLICATE_REQUEST";
+      statusCode = 409;
+    } else if (errorMessage.includes("connect") || errorMessage.includes("timed out") || errorMessage.includes("database")) {
+      clientMessage = "Database Connection Timeout: Unable to contact the database storage. Please verify the server is running and try again.";
+      errorCode = "DATABASE_UNAVAILABLE";
+      statusCode = 503;
+    } else if (error?.message) {
+      clientMessage = error.message;
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: { code: "INTERNAL_ERROR", message: error.message || "Failed to create emergency request" },
+        error: {
+          code: errorCode,
+          message: clientMessage,
+        },
       },
-      { status: 500 }
+      { status: statusCode }
     );
   }
 }

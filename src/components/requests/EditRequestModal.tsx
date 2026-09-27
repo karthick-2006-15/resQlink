@@ -113,10 +113,17 @@ export function EditRequestModal({
         onClose();
         if (onSuccess) onSuccess();
       } else {
-        toast.error(data.error?.message || "Failed to update request");
+        const errorMsg = data.error?.message || "Failed to update request";
+        toast.error("Unable to Update Request", {
+          description: errorMsg,
+          duration: 7000,
+        });
       }
     } catch (err: any) {
-      toast.error("Network error: " + err.message);
+      toast.error("Network Error", {
+        description: err.message || "Failed to communicate with emergency response server",
+        duration: 7000,
+      });
     } finally {
       setIsSubmitting(false);
     }

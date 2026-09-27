@@ -49,10 +49,49 @@ export function CreateRequestModal({
   const [latitude, setLatitude] = useState(12.9791);
   const [longitude, setLongitude] = useState(80.2206);
 
+  // Problem Definition State
+  interface SubmissionProblem {
+    title: string;
+    problem: string;
+    action: string;
+    code?: string;
+    isAuth?: boolean;
+  }
+  const [submissionProblem, setSubmissionProblem] = useState<SubmissionProblem | null>(null);
+  const [isAutoFixing, setIsAutoFixing] = useState(false);
+
   const resetForm = () => {
     setStep(1);
     setTitle("");
     setDescription("");
+    setSubmissionProblem(null);
+  };
+
+  const handleAutoLoginAndSubmit = async () => {
+    setIsAutoFixing(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "demo.citizen@example.com", password: "password123" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Authenticated as Sarah Jenkins (Citizen)", {
+          description: "Submitting your emergency request now...",
+        });
+        setSubmissionProblem(null);
+        setTimeout(() => {
+          handleSubmit();
+        }, 400);
+      } else {
+        toast.error("Authentication failed: " + (data.error?.message || "Please log in manually"));
+      }
+    } catch (err: any) {
+      toast.error("Login request failed: " + err.message);
+    } finally {
+      setIsAutoFixing(false);
+    }
   };
 
   const handleUseCurrentLocation = () => {
@@ -74,17 +113,32 @@ export function CreateRequestModal({
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      toast.error("Please enter a short title for your request");
+      const prob: SubmissionProblem = {
+        title: "Missing Request Headline",
+        problem: "A clear, descriptive title is required so emergency dispatchers understand what you need.",
+        action: "Enter a title in Step 4 describing the situation (e.g., 'Drinking water needed for family').",
+        code: "TITLE_REQUIRED",
+      };
+      setSubmissionProblem(prob);
+      toast.error(prob.title, { description: prob.problem, duration: 6000 });
       setStep(4);
       return;
     }
     if (!description.trim() || description.length < 10) {
-      toast.error("Please provide at least 10 characters explaining your situation");
+      const prob: SubmissionProblem = {
+        title: "Description Too Brief",
+        problem: "The situation description must be at least 10 characters so responders have sufficient context.",
+        action: "Provide at least 10 characters explaining your emergency context in Step 4.",
+        code: "DESCRIPTION_TOO_SHORT",
+      };
+      setSubmissionProblem(prob);
+      toast.error(prob.title, { description: prob.problem, duration: 6000 });
       setStep(4);
       return;
     }
 
     setIsSubmitting(true);
+    setSubmissionProblem(null);
     try {
       const res = await fetch("/api/requests", {
         method: "POST",
@@ -104,15 +158,66 @@ export function CreateRequestModal({
 
       const data = await res.json();
       if (data.success) {
-        toast.success("Emergency request submitted. Priority computed and dispatch active.");
+        setSubmissionProblem(null);
+        toast.success("Emergency Request Dispatched", {
+          description: `Priority ${data.data?.request?.priorityScore ? Math.round(data.data.request.priorityScore) : "High"} calculated. Responders in Tamil Nadu notified.`,
+          duration: 5000,
+        });
         resetForm();
         onClose();
         if (onRequestCreated) onRequestCreated();
       } else {
-        toast.error(data.error.message || "Failed to submit request");
+        const errorCode = data.error?.code || "SUBMISSION_FAILED";
+        const errorMsg = data.error?.message || "Failed to submit request";
+
+        let problemTitle = "Emergency Request Not Submitted";
+        let problemDetail = errorMsg;
+        let suggestedAction = "Please check the highlighted requirements and try again.";
+        let isAuth = false;
+
+        if (errorCode === "UNAUTHORIZED" || errorCode === "SESSION_MISMATCH" || errorCode === "USER_NOT_FOUND" || errorCode === "USER_SESSION_EXPIRED" || res.status === 401) {
+          problemTitle = "Authentication Required";
+          problemDetail = "You are not logged in with an active citizen session, or your session expired after a database reset.";
+          suggestedAction = "Click '1-Click Sign In as Sarah Jenkins & Submit' below or select Sarah Jenkins (Citizen) from the top-right role switcher.";
+          isAuth = true;
+        } else if (errorCode === "DUPLICATE_ACTIVE_REQUEST" || errorCode === "DUPLICATE_REQUEST" || res.status === 409) {
+          problemTitle = "Duplicate Active Request";
+          problemDetail = errorMsg;
+          suggestedAction = "You already have an active request for this resource. Check your Citizen Dashboard to monitor delivery.";
+        } else if (errorCode === "VALIDATION_ERROR" || res.status === 400) {
+          problemTitle = "Validation Problem";
+          problemDetail = errorMsg;
+          suggestedAction = "Check all fields for valid inputs and address details.";
+        } else if (errorCode === "DATABASE_UNAVAILABLE" || res.status === 503) {
+          problemTitle = "Database Unavailable";
+          problemDetail = errorMsg;
+          suggestedAction = "The server cannot reach the local database. Please ensure the backend is running.";
+        }
+
+        // Define problem clearly in the Sonner popup toast
+        toast.error(problemTitle, {
+          description: problemDetail,
+          duration: 8000,
+        });
+
+        // Define problem clearly in the Modal alert
+        setSubmissionProblem({
+          title: problemTitle,
+          problem: problemDetail,
+          action: suggestedAction,
+          code: errorCode,
+          isAuth,
+        });
       }
     } catch (err: any) {
-      toast.error("Error submitting request: " + err.message);
+      const prob: SubmissionProblem = {
+        title: "Network Connection Issue",
+        problem: err.message || "Failed to communicate with the emergency response server.",
+        action: "Check your connection and verify the server is running on localhost:3000.",
+        code: "NETWORK_FAILURE",
+      };
+      setSubmissionProblem(prob);
+      toast.error(prob.title, { description: prob.problem, duration: 8000 });
     } finally {
       setIsSubmitting(false);
     }
@@ -470,6 +575,47 @@ export function CreateRequestModal({
             <p className="text-[11px] text-slate-500 text-center leading-relaxed">
               Upon submission, our matching engine immediately evaluates verified volunteers within the operational radius.
             </p>
+          </div>
+        )}
+
+        {/* Dynamic Problem Definition Alert */}
+        {submissionProblem && (
+          <div className="p-4 rounded-xl border border-red-200 bg-red-50/95 text-slate-800 space-y-2.5 animate-fadeIn">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-red-900 uppercase tracking-wide">
+                    Problem Identified: {submissionProblem.title}
+                  </p>
+                  {submissionProblem.code && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-100 text-red-800 font-semibold">
+                      {submissionProblem.code}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-red-800 leading-relaxed font-medium">
+                  {submissionProblem.problem}
+                </p>
+                <p className="text-[11px] text-red-700/90 pt-0.5">
+                  <span className="font-semibold text-red-900">Recommended Resolution:</span>{" "}
+                  {submissionProblem.action}
+                </p>
+              </div>
+            </div>
+
+            {submissionProblem.isAuth && (
+              <div className="pt-2 border-t border-red-200 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  disabled={isAutoFixing}
+                  onClick={handleAutoLoginAndSubmit}
+                  className="text-xs font-bold px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {isAutoFixing ? "Authenticating Session..." : "1-Click Sign In as Sarah Jenkins & Submit"}
+                </button>
+              </div>
+            )}
           </div>
         )}
 

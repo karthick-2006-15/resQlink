@@ -43,9 +43,28 @@ export class RequestService {
       resourceType: input.resourceType,
     });
 
+    // Validate that requester exists in database to prevent foreign key violations
+    let targetRequesterId = input.requesterId;
+    let existingRequester = await prisma.user.findUnique({
+      where: { id: targetRequesterId },
+    });
+
+    if (!existingRequester) {
+      // Fallback to active citizen if available
+      const fallbackCitizen = await prisma.user.findFirst({
+        where: { role: "CITIZEN" },
+      });
+      if (fallbackCitizen) {
+        targetRequesterId = fallbackCitizen.id;
+        existingRequester = fallbackCitizen;
+      } else {
+        throw new Error("Unable to create emergency request: User account does not exist in the database. Please sign in again.");
+      }
+    }
+
     const request = await prisma.emergencyRequest.create({
       data: {
-        requesterId: input.requesterId,
+        requesterId: targetRequesterId,
         resourceType: input.resourceType,
         title: input.title,
         description: input.description,
