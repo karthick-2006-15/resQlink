@@ -10,6 +10,7 @@ import { CardSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RequestCard } from "@/components/requests/RequestCard";
 import { CreateRequestModal } from "@/components/requests/CreateRequestModal";
+import { EditRequestModal } from "@/components/requests/EditRequestModal";
 import { ConfirmDeliveryModal } from "@/components/requests/ConfirmDeliveryModal";
 import { Plus, Clock, CheckCircle2, AlertTriangle, ShieldAlert, Sparkles, Inbox } from "lucide-react";
 import { EmergencyRequestData, UserSummary } from "@/types";
@@ -28,6 +29,27 @@ export default function CitizenDashboard() {
     resource: string;
     quantity: string;
   } | null>(null);
+  const [editingRequest, setEditingRequest] = useState<EmergencyRequestData | null>(null);
+
+  const handleDeleteRequest = async (id: string) => {
+    const confirmed = window.confirm("Are you sure you want to permanently delete this emergency request?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/requests/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Emergency request deleted.");
+        fetchCitizenData();
+      } else {
+        toast.error(data.error?.message || "Failed to delete request");
+      }
+    } catch {
+      toast.error("Network error deleting request");
+    }
+  };
 
   const fetchCitizenData = async () => {
     try {
@@ -194,6 +216,8 @@ export default function CitizenDashboard() {
                     key={req.id}
                     request={req}
                     role="CITIZEN"
+                    onEdit={(r) => setEditingRequest(r)}
+                    onDelete={handleDeleteRequest}
                     onConfirmDelivery={() =>
                       setConfirmModalData({
                         id: req.id,
@@ -235,6 +259,14 @@ export default function CitizenDashboard() {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onRequestCreated={fetchCitizenData}
+      />
+
+      {/* Edit Request Modal */}
+      <EditRequestModal
+        isOpen={!!editingRequest}
+        request={editingRequest}
+        onClose={() => setEditingRequest(null)}
+        onSuccess={fetchCitizenData}
       />
 
       {/* Confirmation Modal */}

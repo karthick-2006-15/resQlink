@@ -5,7 +5,7 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { PriorityBadge, ResourceBadge, StatusBadge } from "../ui/Badge";
 import { Button } from "../ui/Button";
-import { Users, MapPin, Clock, ArrowRight, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Users, MapPin, Clock, ArrowRight, ShieldCheck, CheckCircle2, Pencil, Trash2 } from "lucide-react";
 import { EmergencyRequestData } from "@/types";
 
 interface RequestCardProps {
@@ -14,6 +14,8 @@ interface RequestCardProps {
   onAccept?: (id: string) => void;
   onVerify?: (id: string) => void;
   onConfirmDelivery?: (id: string) => void;
+  onEdit?: (request: EmergencyRequestData) => void;
+  onDelete?: (id: string) => void;
   isAccepting?: boolean;
 }
 
@@ -23,6 +25,8 @@ export function RequestCard({
   onAccept,
   onVerify,
   onConfirmDelivery,
+  onEdit,
+  onDelete,
   isAccepting = false,
 }: RequestCardProps) {
   const isCritical = request.priorityLevel === "CRITICAL" && request.status !== "CLOSED";
@@ -112,7 +116,7 @@ export function RequestCard({
           </>
         )}
 
-        {/* Citizen Delivery Confirmation Action */}
+        {/* Citizen Actions */}
         {role === "CITIZEN" && (
           <div className="flex items-center justify-between w-full gap-2">
             {request.status === "DELIVERED" ? (
@@ -123,9 +127,31 @@ export function RequestCard({
                 leftIcon={<CheckCircle2 className="w-4 h-4" />}
                 onClick={() => onConfirmDelivery && onConfirmDelivery(request.id)}
               >
-                Confirm Supplies Received
+                Confirm Received
               </Button>
             ) : null}
+
+            {onEdit && request.status !== "DELIVERED" && request.status !== "CLOSED" && (
+              <button
+                type="button"
+                onClick={() => onEdit(request)}
+                title="Edit emergency request"
+                className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onDelete && request.status !== "DELIVERED" && request.status !== "CLOSED" && (
+              <button
+                type="button"
+                onClick={() => onDelete(request.id)}
+                title="Delete emergency request"
+                className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
 
             <Link href={`/citizen/requests/${request.id}`} className="flex-1">
               <Button size="sm" variant="secondary" className="w-full" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>

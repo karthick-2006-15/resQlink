@@ -9,9 +9,11 @@ import { Button } from "@/components/ui/Button";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { CreateRequestModal } from "@/components/requests/CreateRequestModal";
+import { EditRequestModal } from "@/components/requests/EditRequestModal";
 import { ConfirmDeliveryModal } from "@/components/requests/ConfirmDeliveryModal";
 import { Plus, Search, Filter, Inbox } from "lucide-react";
 import { EmergencyRequestData } from "@/types";
+import { toast } from "sonner";
 
 export default function CitizenRequestsPage() {
   const [requests, setRequests] = useState<EmergencyRequestData[]>([]);
@@ -24,6 +26,27 @@ export default function CitizenRequestsPage() {
     resource: string;
     quantity: string;
   } | null>(null);
+  const [editingRequest, setEditingRequest] = useState<EmergencyRequestData | null>(null);
+
+  const handleDeleteRequest = async (id: string) => {
+    const confirmed = window.confirm("Are you sure you want to permanently delete this emergency request?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/requests/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Emergency request deleted.");
+        fetchRequests();
+      } else {
+        toast.error(data.error?.message || "Failed to delete request");
+      }
+    } catch {
+      toast.error("Network error deleting request");
+    }
+  };
 
   const fetchRequests = async () => {
     try {
@@ -133,6 +156,8 @@ export default function CitizenRequestsPage() {
                   key={req.id}
                   request={req}
                   role="CITIZEN"
+                  onEdit={(r) => setEditingRequest(r)}
+                  onDelete={handleDeleteRequest}
                   onConfirmDelivery={() =>
                     setConfirmModalData({
                       id: req.id,
@@ -153,6 +178,13 @@ export default function CitizenRequestsPage() {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onRequestCreated={fetchRequests}
+      />
+
+      <EditRequestModal
+        isOpen={!!editingRequest}
+        request={editingRequest}
+        onClose={() => setEditingRequest(null)}
+        onSuccess={fetchRequests}
       />
 
       {confirmModalData && (

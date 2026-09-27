@@ -24,10 +24,13 @@ import {
   Copy,
   Check,
   Radio,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { EmergencyRequestData, AuditLogData } from "@/types";
 import { toast } from "sonner";
 import { CardSkeleton, Skeleton } from "@/components/ui/Skeleton";
+import { EditRequestModal } from "@/components/requests/EditRequestModal";
 
 export default function RequestTrackingPage() {
   const params = useParams();
@@ -40,6 +43,31 @@ export default function RequestTrackingPage() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteRequest = async () => {
+    const confirmed = window.confirm("Are you sure you want to permanently delete this emergency request? Any assigned volunteers will be unassigned.");
+    if (!confirmed) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/requests/${requestId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Emergency request has been deleted.");
+        router.push("/citizen/requests");
+      } else {
+        toast.error(data.error?.message || "Failed to delete request");
+        setIsDeleting(false);
+      }
+    } catch {
+      toast.error("Network error deleting request");
+      setIsDeleting(false);
+    }
+  };
 
   const handleCopyLink = () => {
     if (typeof window !== "undefined") {
@@ -178,7 +206,28 @@ export default function RequestTrackingPage() {
             <span>Back to Overview</span>
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {request.status !== "DELIVERED" && request.status !== "CLOSED" && (
+              <>
+                <button
+                  onClick={() => setIsEditOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:bg-blue-50 text-xs font-semibold shadow-sm transition-all"
+                >
+                  <Pencil className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Edit Details</span>
+                </button>
+
+                <button
+                  onClick={handleDeleteRequest}
+                  disabled={isDeleting}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold shadow-sm transition-all"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                  <span>{isDeleting ? "Deleting..." : "Delete"}</span>
+                </button>
+              </>
+            )}
+
             <button
               onClick={handleCopyLink}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-sm transition-all"
@@ -401,6 +450,14 @@ export default function RequestTrackingPage() {
           </div>
         </div>
       </main>
+
+      {/* Edit Request Modal */}
+      <EditRequestModal
+        isOpen={isEditOpen}
+        request={request}
+        onClose={() => setIsEditOpen(false)}
+        onSuccess={fetchDetails}
+      />
 
       {/* Confirmation Modal */}
       <ConfirmDeliveryModal
