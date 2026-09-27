@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { TableRowSkeleton } from "@/components/ui/Skeleton";
 import { StatusBadge, PriorityBadge, ResourceBadge } from "@/components/ui/Badge";
 import {
   ClipboardList,
@@ -241,11 +242,13 @@ export default function AdminRequestsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                   {isLoading ? (
-                    <tr>
-                      <td colSpan={7} className="py-12 text-center text-slate-400 font-sans">
-                        Loading requests registry...
-                      </td>
-                    </tr>
+                    <>
+                      <TableRowSkeleton cols={7} />
+                      <TableRowSkeleton cols={7} />
+                      <TableRowSkeleton cols={7} />
+                      <TableRowSkeleton cols={7} />
+                      <TableRowSkeleton cols={7} />
+                    </>
                   ) : filtered.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="py-12 text-center text-slate-400 font-sans">

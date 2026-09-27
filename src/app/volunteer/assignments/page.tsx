@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { AssignmentData } from "@/types";
 import { toast } from "sonner";
+import { CardSkeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export default function VolunteerAssignmentsPage() {
   const [assignments, setAssignments] = useState<AssignmentData[]>([]);
@@ -130,29 +132,21 @@ export default function VolunteerAssignmentsPage() {
           {/* List */}
           {isLoading ? (
             <div className="space-y-4">
-              {[1, 2].map((i) => (
-                <div key={i} className="h-44 bg-white rounded-3xl border border-slate-200 animate-pulse" />
-              ))}
+              <CardSkeleton />
+              <CardSkeleton />
             </div>
           ) : displayedList.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center shadow-sm">
-              <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <h3 className="text-base font-bold text-slate-800">
-                {tab === "ACTIVE" ? "No active delivery missions" : "No past delivery history"}
-              </h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                {tab === "ACTIVE"
-                  ? "Check nearby requests to accept new dispatches in your area."
-                  : "Completed missions will appear here once confirmed by recipients."}
-              </p>
-              {tab === "ACTIVE" && (
-                <Link href="/volunteer/nearby">
-                  <Button variant="primary" size="sm" className="mt-4 font-bold">
-                    Browse Nearby Requests
-                  </Button>
-                </Link>
-              )}
-            </div>
+            <EmptyState
+              icon={<Inbox className="w-6 h-6" />}
+              title={tab === "ACTIVE" ? "No active delivery missions" : "No past delivery history"}
+              description={
+                tab === "ACTIVE"
+                  ? "Check nearby requests to accept new emergency dispatches in your operating radius."
+                  : "Completed missions will appear here once verified and confirmed by recipients."
+              }
+              actionText={tab === "ACTIVE" ? "Browse Nearby Requests" : undefined}
+              onAction={tab === "ACTIVE" ? () => (window.location.href = "/volunteer/nearby") : undefined}
+            />
           ) : (
             <div className="space-y-4">
               {displayedList.map((assignment) => {

@@ -5,6 +5,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/Button";
+import { CardSkeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { ResourceBadge } from "@/components/ui/Badge";
 import {
   Users,
@@ -129,20 +131,17 @@ export default function AdminVolunteersPage() {
           {/* Volunteers List */}
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-52 bg-white rounded-3xl border border-slate-200 animate-pulse" />
-              ))}
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
             </div>
           ) : volunteers.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center shadow-sm">
-              <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <h3 className="text-base font-bold text-slate-800">
-                {filter === "pending" ? "No pending volunteer applicants" : "No volunteers found"}
-              </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                {filter === "pending" ? "All registered community volunteers have been verified." : ""}
-              </p>
-            </div>
+            <EmptyState
+              icon={<Inbox className="w-6 h-6" />}
+              title={filter === "pending" ? "No pending volunteer applicants" : "No volunteers found"}
+              description={filter === "pending" ? "All registered community volunteers have been processed and verified." : "No responder records match the selected filter."}
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {volunteers.map((v) => {

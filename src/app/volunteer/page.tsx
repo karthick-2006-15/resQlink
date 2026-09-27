@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/Button";
+import { MetricCard } from "@/components/ui/Card";
 import { StatusBadge, PriorityBadge, ResourceBadge } from "@/components/ui/Badge";
 import {
   ShieldCheck,
@@ -183,50 +184,35 @@ export default function VolunteerDashboard() {
           </div>
 
           {/* Quick Metrics */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-1.5 text-blue-600 mb-1">
-                <Radio className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Nearby Needs
-                </span>
-              </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">{nearbyCount}</p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-1.5 text-purple-600 mb-1">
-                <Truck className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Active Missions
-                </span>
-              </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">{activeAssignments.length}</p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-1.5 text-emerald-600 mb-1">
-                <CheckCircle2 className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Completed Missions
-                </span>
-              </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                {profile?.completedAssignments || 0}
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-1.5 text-amber-600 mb-1">
-                <Award className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Rating
-                </span>
-              </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                {profile?.rating || 5.0} <span className="text-xs text-slate-400 font-normal">/ 5.0</span>
-              </p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <MetricCard
+              title="Nearby Needs"
+              value={nearbyCount}
+              subtitle="Inside your verified operating radius"
+              icon={<Radio className="w-5 h-5" />}
+              variant="info"
+            />
+            <MetricCard
+              title="Active Missions"
+              value={activeAssignments.length}
+              subtitle="Deliveries currently under transit"
+              icon={<Truck className="w-5 h-5" />}
+              variant="default"
+            />
+            <MetricCard
+              title="Completed Missions"
+              value={profile?.completedAssignments || 0}
+              subtitle="Verified deliveries confirmed by citizens"
+              icon={<CheckCircle2 className="w-5 h-5" />}
+              variant="success"
+            />
+            <MetricCard
+              title="Responder Rating"
+              value={`${profile?.rating || 5.0} / 5.0`}
+              subtitle="Citizen satisfaction score"
+              icon={<Award className="w-5 h-5" />}
+              variant="warning"
+            />
           </div>
 
           {/* ACTIVE ASSIGNMENT ACTION CARD */}

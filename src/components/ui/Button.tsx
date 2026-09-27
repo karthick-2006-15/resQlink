@@ -27,17 +27,17 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-all duration-150 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]";
+      "inline-flex items-center justify-center font-semibold transition-all duration-150 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]";
 
     const sizeStyles = {
-      sm: "px-3 py-1.5 text-xs gap-1.5 min-h-[32px]",
+      sm: "px-3 py-1.5 text-xs gap-1.5 min-h-[34px]",
       md: "px-4 py-2 text-sm gap-2 min-h-[42px]",
       lg: "px-6 py-3 text-base gap-2.5 min-h-[48px]",
     };
 
     const variantStyles = {
       primary:
-        "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow focus:ring-blue-500",
+        "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm hover:shadow-md shadow-blue-500/10 focus-visible:ring-blue-600",
       secondary:
         "bg-slate-100 hover:bg-slate-200 text-slate-800 focus:ring-slate-400 border border-slate-200",
       outline:

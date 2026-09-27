@@ -5,6 +5,9 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/Button";
+import { MetricCard } from "@/components/ui/Card";
+import { CardSkeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { RequestCard } from "@/components/requests/RequestCard";
 import { CreateRequestModal } from "@/components/requests/CreateRequestModal";
 import { ConfirmDeliveryModal } from "@/components/requests/ConfirmDeliveryModal";
@@ -99,49 +102,35 @@ export default function CitizenDashboard() {
           </div>
 
           {/* Quick Metrics */}
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-2 text-rose-600 mb-1">
-                <AlertTriangle className="w-4 h-4" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Active
-                </span>
-              </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                {activeRequests.length}
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-2 text-emerald-600 mb-1">
-                <CheckCircle2 className="w-4 h-4" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Resolved
-                </span>
-              </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                {resolvedRequests.length}
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-2 text-amber-600 mb-1">
-                <Clock className="w-4 h-4" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Pending Review
-                </span>
-              </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                {pendingRequests.length}
-              </p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
+            <MetricCard
+              title="Active Incidents"
+              value={activeRequests.length}
+              subtitle="Requiring responder dispatch or in-flight transit"
+              icon={<AlertTriangle className="w-5 h-5" />}
+              variant="critical"
+            />
+            <MetricCard
+              title="Resolved Requests"
+              value={resolvedRequests.length}
+              subtitle="Supplies confirmed and closed successfully"
+              icon={<CheckCircle2 className="w-5 h-5" />}
+              variant="success"
+            />
+            <MetricCard
+              title="Pending Review"
+              value={pendingRequests.length}
+              subtitle="Queued for admin operations validation"
+              icon={<Clock className="w-5 h-5" />}
+              variant="warning"
+            />
           </div>
 
           {/* Delivered Alert Banner (Action Needed from Citizen!) */}
           {activeRequests.some((r) => r.status === "DELIVERED") && (
             <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-400/80 shadow-md animate-beacon flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-sm shadow-emerald-600/30">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>
@@ -156,7 +145,7 @@ export default function CitizenDashboard() {
               <Button
                 variant="success"
                 size="sm"
-                className="font-bold whitespace-nowrap"
+                className="font-bold whitespace-nowrap shadow-sm"
                 onClick={() => {
                   const delReq = activeRequests.find((r) => r.status === "DELIVERED");
                   if (delReq) {
@@ -186,27 +175,18 @@ export default function CitizenDashboard() {
 
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[1, 2].map((i) => (
-                  <div key={i} className="h-44 bg-white rounded-2xl border border-slate-200 animate-pulse p-5" />
-                ))}
+                <CardSkeleton />
+                <CardSkeleton />
               </div>
             ) : activeRequests.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm">
-                <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                <h3 className="text-base font-bold text-slate-800">No active emergency requests</h3>
-                <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                  You are all caught up. When you or someone near you needs emergency water, food, shelter, or transport, click below.
-                </p>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="mt-4 font-semibold"
-                  leftIcon={<Plus className="w-4 h-4" />}
-                  onClick={() => setIsCreateOpen(true)}
-                >
-                  Create Emergency Request
-                </Button>
-              </div>
+              <EmptyState
+                icon={<Inbox className="w-6 h-6" />}
+                title="No active emergency requests"
+                description="You have no pending requests in the system. When you or someone near you needs emergency water, food, shelter, or transport, click below."
+                actionText="Create Emergency Request"
+                actionIcon={<Plus className="w-4 h-4" />}
+                onAction={() => setIsCreateOpen(true)}
+              />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activeRequests.map((req) => (

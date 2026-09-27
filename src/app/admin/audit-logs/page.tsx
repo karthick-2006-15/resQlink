@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { FileText, ShieldAlert, Clock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { TableRowSkeleton } from "@/components/ui/Skeleton";
 import { AuditLogData } from "@/types";
 
 export default function AdminAuditLogsPage() {
@@ -79,11 +80,13 @@ export default function AdminAuditLogsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-mono text-slate-700">
                   {isLoading ? (
-                    <tr>
-                      <td colSpan={6} className="py-12 text-center text-slate-400 font-sans">
-                        Loading audit events...
-                      </td>
-                    </tr>
+                    <>
+                      <TableRowSkeleton cols={6} />
+                      <TableRowSkeleton cols={6} />
+                      <TableRowSkeleton cols={6} />
+                      <TableRowSkeleton cols={6} />
+                      <TableRowSkeleton cols={6} />
+                    </>
                   ) : logs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-12 text-center text-slate-400 font-sans">

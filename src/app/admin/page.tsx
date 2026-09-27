@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { EmergencyMap } from "@/components/map/EmergencyMap";
 import { Button } from "@/components/ui/Button";
+import { MetricCard } from "@/components/ui/Card";
 import { StatusBadge, PriorityBadge, ResourceBadge } from "@/components/ui/Badge";
 import {
   ShieldAlert,
@@ -133,58 +134,43 @@ export default function AdminCommandCenter() {
           </div>
 
           {/* Operational KPIs */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-1.5 text-blue-600 mb-1">
-                <Activity className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Active Requests
-                </span>
-              </div>
-              <p className="text-3xl font-black text-slate-900">{metrics.activeRequests}</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-rose-200 shadow-sm bg-rose-50/20">
-              <div className="flex items-center gap-1.5 text-rose-600 mb-1">
-                <AlertCircle className="w-4 h-4 animate-pulse" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700">
-                  Critical Level
-                </span>
-              </div>
-              <p className="text-3xl font-black text-rose-600">{metrics.criticalRequests}</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-1.5 text-emerald-600 mb-1">
-                <Users className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Available Vol.
-                </span>
-              </div>
-              <p className="text-3xl font-black text-slate-900">{metrics.availableVolunteers}</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-1.5 text-slate-700 mb-1">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Resolved Today
-                </span>
-              </div>
-              <p className="text-3xl font-black text-slate-900">{metrics.resolvedRequests}</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm col-span-2 lg:col-span-1">
-              <div className="flex items-center gap-1.5 text-indigo-600 mb-1">
-                <Clock className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Avg. Response
-                </span>
-              </div>
-              <p className="text-3xl font-black text-slate-900">
-                {metrics.avgResponseMinutes} <span className="text-xs text-slate-400 font-normal">min</span>
-              </p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
+            <MetricCard
+              title="Active Requests"
+              value={metrics.activeRequests}
+              subtitle="Active crisis incidents on grid"
+              icon={<Activity className="w-5 h-5" />}
+              variant="default"
+            />
+            <MetricCard
+              title="Critical Priority"
+              value={metrics.criticalRequests}
+              subtitle="Immediate action required"
+              icon={<AlertCircle className="w-5 h-5 animate-pulse" />}
+              variant="critical"
+            />
+            <MetricCard
+              title="Available Responders"
+              value={metrics.availableVolunteers}
+              subtitle="Verified & active on radar"
+              icon={<Users className="w-5 h-5" />}
+              variant="info"
+            />
+            <MetricCard
+              title="Resolved Incidents"
+              value={metrics.resolvedRequests}
+              subtitle="Confirmed deliveries closed"
+              icon={<CheckCircle2 className="w-5 h-5" />}
+              variant="success"
+            />
+            <MetricCard
+              title="Avg. Response"
+              value={`${metrics.avgResponseMinutes}m`}
+              subtitle="Triage to assignment speed"
+              icon={<Clock className="w-5 h-5" />}
+              variant="warning"
+              className="sm:col-span-2 lg:col-span-1"
+            />
           </div>
 
           {/* Interactive Live Crisis Map */}

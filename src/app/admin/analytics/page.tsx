@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { MetricCard } from "@/components/ui/Card";
 import {
   BarChart,
   Bar,
@@ -89,57 +90,35 @@ export default function AdminAnalyticsPage() {
           </div>
 
           {/* Primary KPIs */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-2 text-blue-600 mb-1">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Total Dispatches
-                </span>
-              </div>
-              <p className="text-3xl font-black text-slate-900">{kpis.totalRequests}</p>
-              <p className="text-[11px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" />
-                <span>{kpis.resolvedRequests} confirmed resolved</span>
-              </p>
-            </div>
-
-            <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-2 text-indigo-600 mb-1">
-                <Clock className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Avg. Response Time
-                </span>
-              </div>
-              <p className="text-3xl font-black text-slate-900">
-                {kpis.avgResponseMinutes} <span className="text-xs text-slate-400 font-normal">min</span>
-              </p>
-              <p className="text-[11px] text-slate-400 mt-1">Creation to volunteer acceptance</p>
-            </div>
-
-            <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-2 text-emerald-600 mb-1">
-                <Clock className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Avg. Resolution Time
-                </span>
-              </div>
-              <p className="text-3xl font-black text-slate-900">
-                {kpis.avgResolutionMinutes} <span className="text-xs text-slate-400 font-normal">min</span>
-              </p>
-              <p className="text-[11px] text-slate-400 mt-1">Creation to citizen receipt confirm</p>
-            </div>
-
-            <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-2 text-amber-600 mb-1">
-                <Users className="w-4 h-4" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Active Volunteer Force
-                </span>
-              </div>
-              <p className="text-3xl font-black text-slate-900">{kpis.availableVolunteers}</p>
-              <p className="text-[11px] text-slate-400 mt-1">100% verified on-duty responders</p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <MetricCard
+              title="Total Dispatches"
+              value={kpis.totalRequests}
+              subtitle={`${kpis.resolvedRequests} deliveries confirmed & resolved`}
+              icon={<TrendingUp className="w-5 h-5" />}
+              variant="default"
+            />
+            <MetricCard
+              title="Avg. Response Time"
+              value={`${kpis.avgResponseMinutes} min`}
+              subtitle="From incident log to responder acceptance"
+              icon={<Clock className="w-5 h-5" />}
+              variant="info"
+            />
+            <MetricCard
+              title="Avg. Resolution Time"
+              value={`${kpis.avgResolutionMinutes} min`}
+              subtitle="From dispatch to citizen confirmation"
+              icon={<CheckCircle2 className="w-5 h-5" />}
+              variant="success"
+            />
+            <MetricCard
+              title="Active Responder Force"
+              value={kpis.availableVolunteers}
+              subtitle="100% verified on-duty responders"
+              icon={<Users className="w-5 h-5" />}
+              variant="warning"
+            />
           </div>
 
           {/* Charts Grid */}

@@ -7,6 +7,8 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { RequestCard } from "@/components/requests/RequestCard";
 import { Button } from "@/components/ui/Button";
+import { CardSkeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Radio, Filter, RefreshCw, AlertTriangle, Inbox } from "lucide-react";
 import { EmergencyRequestData, VolunteerProfileData } from "@/types";
 import { toast } from "sonner";
@@ -150,18 +152,17 @@ export default function VolunteerNearbyPage() {
           {/* Requests Grid */}
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-48 bg-white rounded-xl border border-slate-200 animate-pulse" />
-              ))}
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-sm">
-              <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <h3 className="text-base font-bold text-slate-800">No requests nearby</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                All community requests in your immediate vicinity are currently assigned or resolved.
-              </p>
-            </div>
+            <EmptyState
+              icon={<Inbox className="w-6 h-6" />}
+              title="No requests currently nearby"
+              description="All community requests in your immediate vicinity are currently assigned or resolved. Check back or expand your radius in profile settings."
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filtered.map((req) => (

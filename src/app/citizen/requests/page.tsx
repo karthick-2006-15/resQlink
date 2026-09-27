@@ -6,6 +6,8 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { RequestCard } from "@/components/requests/RequestCard";
 import { Button } from "@/components/ui/Button";
+import { CardSkeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { CreateRequestModal } from "@/components/requests/CreateRequestModal";
 import { ConfirmDeliveryModal } from "@/components/requests/ConfirmDeliveryModal";
 import { Plus, Search, Filter, Inbox } from "lucide-react";
@@ -113,16 +115,17 @@ export default function CitizenRequestsPage() {
           {/* Requests Grid */}
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-44 bg-white rounded-2xl border border-slate-200 animate-pulse" />
-              ))}
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
-              <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <h3 className="text-base font-bold text-slate-800">No requests match criteria</h3>
-              <p className="text-xs text-slate-400 mt-1">Try resetting the status filter or search query.</p>
-            </div>
+            <EmptyState
+              icon={<Inbox className="w-6 h-6" />}
+              title="No requests match criteria"
+              description="Try adjusting your status filter or search query to find previous emergency records."
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filtered.map((req) => (
