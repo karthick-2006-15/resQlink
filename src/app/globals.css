@@ -92,3 +92,10 @@ body {
   border-radius: 0.75rem;
   z-index: 10;
 }
+
+/* Leaflet custom map marker transparent container */
+.leaflet-div-icon.custom-map-marker {
+  background: transparent !important;
+  border: none !important;
+}
+

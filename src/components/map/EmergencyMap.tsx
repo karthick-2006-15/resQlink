@@ -62,11 +62,24 @@ export function EmergencyMap({
   useEffect(() => {
     setIsClient(true);
     import("leaflet").then((leaflet) => {
-      setL(leaflet.default);
+      const leafletInstance = leaflet.default;
+      try {
+        delete (leafletInstance.Icon.Default.prototype as any)._getIconUrl;
+        leafletInstance.Icon.Default.mergeOptions({
+          iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+          iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+          shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        });
+      } catch {
+        // Ignore if already patched
+      }
+      setL(leafletInstance);
     });
   }, []);
 
   const filteredRequests = requests.filter((r) => {
+    if (typeof r.latitude !== "number" || typeof r.longitude !== "number") return false;
+    if (isNaN(r.latitude) || isNaN(r.longitude)) return false;
     if (selectedResource !== "ALL" && r.resourceType !== selectedResource) return false;
     if (selectedPriority !== "ALL" && r.priorityLevel !== selectedPriority) return false;
     return true;
