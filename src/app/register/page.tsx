@@ -23,7 +23,7 @@ export default function RegisterPage() {
   // Volunteer Fields
   const [capabilities, setCapabilities] = useState<ResourceType[]>(["WATER", "FOOD"]);
   const [serviceRadiusKm, setServiceRadiusKm] = useState(10);
-  const [vehicleType, setVehicleType] = useState("SUV / Car");
+  const [vehicleType, setVehicleType] = useState("SUV / 4x4");
   const [bio, setBio] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +68,7 @@ export default function RegisterPage() {
 
       const data = await res.json();
       if (data.success) {
-        toast.success(`Account registered successfully as ${role}!`);
+        toast.success(`Account registered successfully as ${role}`);
         if (role === "VOLUNTEER") {
           router.push("/volunteer");
         } else {
@@ -86,46 +86,46 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Navbar />
 
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-slate-200/90 p-8 my-6">
+        <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-slate-200 p-8 my-6">
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-500/25">
-              <ShieldAlert className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-lg bg-blue-700 text-white flex items-center justify-center mx-auto mb-3">
+              <ShieldAlert className="w-5 h-5" />
             </div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              Create Your ResQLink Account
+              Create ResQLink Account
             </h1>
             <p className="text-xs text-slate-500 mt-1">
-              Select how you want to participate in the community response network
+              Select participation mode for the emergency response network
             </p>
           </div>
 
           {/* Role Choice Selector */}
           <div className="mb-6">
-            <label className="block text-xs font-bold text-slate-700 mb-2">
-              How do you want to use ResQLink?
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              Registration Role
             </label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setRole("CITIZEN")}
-                className={`p-4 rounded-2xl border text-left flex flex-col gap-2 transition-all ${
+                className={`p-4 rounded-xl border text-left flex flex-col gap-2 transition-all ${
                   role === "CITIZEN"
-                    ? "border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 shadow-sm"
+                    ? "border-blue-600 bg-blue-50/50 ring-1 ring-blue-500 shadow-sm"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
-                <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center">
                   <HeartHandshake className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900">I Need Help</p>
+                  <p className="text-sm font-semibold text-slate-900">Citizen / Requester</p>
                   <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                    Request water, food, transport & shelter during emergency
+                    Request water, food, transport & shelter during crisis
                   </p>
                 </div>
               </button>
@@ -133,19 +133,19 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setRole("VOLUNTEER")}
-                className={`p-4 rounded-2xl border text-left flex flex-col gap-2 transition-all ${
+                className={`p-4 rounded-xl border text-left flex flex-col gap-2 transition-all ${
                   role === "VOLUNTEER"
-                    ? "border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-sm"
+                    ? "border-emerald-600 bg-emerald-50/50 ring-1 ring-emerald-500 shadow-sm"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900">I Want to Volunteer</p>
+                  <p className="text-sm font-semibold text-slate-900">Community Volunteer</p>
                   <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                    Provide resources & mobilize transport for neighbors
+                    Distribute vital supplies & transport vulnerable neighbors
                   </p>
                 </div>
               </button>
@@ -155,39 +155,39 @@ export default function RegisterPage() {
           {/* Form */}
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name</label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Alex Rivera"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Address</label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex@example.com"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
                   type="password"
                   required
@@ -195,36 +195,36 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Phone Number</label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+1 (555) 000-0000"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Neighborhood / Address</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Address / District</label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   <input
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="e.g. SOMA, SF"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -234,24 +234,24 @@ export default function RegisterPage() {
             {role === "VOLUNTEER" && (
               <div className="pt-4 border-t border-slate-100 space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    What emergency resources can you provide or distribute?
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Resource Capabilities (Select all you can provide)
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {[
-                      { id: "WATER", label: "Water 💧" },
-                      { id: "FOOD", label: "Food 🍞" },
-                      { id: "TRANSPORT", label: "Transport 🚗" },
-                      { id: "SHELTER", label: "Shelter 🏕️" },
-                      { id: "OTHER", label: "Supplies 📦" },
+                      { id: "WATER", label: "Clean Water" },
+                      { id: "FOOD", label: "Food Supplies" },
+                      { id: "TRANSPORT", label: "Relocation Transport" },
+                      { id: "SHELTER", label: "Shelter Gear" },
+                      { id: "OTHER", label: "General Supplies" },
                     ].map((c) => (
                       <button
                         key={c.id}
                         type="button"
                         onClick={() => toggleCapability(c.id as ResourceType)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                           capabilities.includes(c.id as ResourceType)
-                            ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                            ? "bg-slate-900 text-white border-slate-900 shadow-sm"
                             : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
                         }`}
                       >
@@ -263,7 +263,7 @@ export default function RegisterPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                       Max Service Radius: {serviceRadiusKm} km
                     </label>
                     <input
@@ -277,11 +277,11 @@ export default function RegisterPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle / Transport</label>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Vehicle Type</label>
                     <select
                       value={vehicleType}
                       onChange={(e) => setVehicleType(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 bg-white"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-white"
                     >
                       <option value="SUV / 4x4">SUV / 4x4</option>
                       <option value="Cargo Van">Cargo Van</option>
@@ -293,13 +293,13 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Bio & Experience</label>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Certifications & Experience</label>
                   <textarea
                     rows={2}
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    placeholder="Certifications, equipment, CERT training, availability details..."
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="CERT trained, first aid responder, equipped with cargo space..."
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function RegisterPage() {
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full font-bold mt-2"
+              className="w-full font-semibold mt-2"
               isLoading={isLoading}
             >
               Complete Registration
@@ -319,8 +319,8 @@ export default function RegisterPage() {
           {/* Footer */}
           <div className="mt-6 pt-4 border-t border-slate-100 text-center">
             <p className="text-xs text-slate-500">
-              Already have an account?{" "}
-              <Link href="/login" className="font-bold text-blue-600 hover:underline">
+              Already registered?{" "}
+              <Link href="/login" className="font-semibold text-blue-600 hover:underline">
                 Sign in
               </Link>
             </p>

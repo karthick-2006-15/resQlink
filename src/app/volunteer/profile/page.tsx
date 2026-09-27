@@ -10,9 +10,9 @@ import {
   Power,
   MapPin,
   Truck,
-  Sparkles,
   Check,
   AlertTriangle,
+  Award,
 } from "lucide-react";
 import { ResourceType, UserSummary, VolunteerProfileData } from "@/types";
 import { toast } from "sonner";
@@ -77,7 +77,7 @@ export default function VolunteerProfilePage() {
 
       const data = await res.json();
       if (data.success) {
-        toast.success("Volunteer capabilities & radius updated!");
+        toast.success("Volunteer dispatch settings updated");
       } else {
         toast.error(data.error.message || "Failed to update profile");
       }
@@ -89,7 +89,7 @@ export default function VolunteerProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Navbar />
 
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
@@ -101,29 +101,30 @@ export default function VolunteerProfilePage() {
               Volunteer Dispatch Profile & Logistics Settings
             </h1>
 
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
               {/* Header Profile Badge */}
               <div className="flex items-center gap-4 pb-6 border-b border-slate-100">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-2xl shadow-lg shadow-blue-500/20">
+                <div className="w-14 h-14 rounded-xl bg-blue-700 text-white flex items-center justify-center font-bold text-xl">
                   {user?.name?.charAt(0) || "V"}
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900">{user?.name}</h2>
+                  <h2 className="text-lg font-bold text-slate-900">{user?.name}</h2>
                   <p className="text-xs text-slate-500">{user?.email}</p>
                   <div className="flex items-center gap-2 mt-1">
                     {profile?.isVerified ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
                         <span>Verified Responder</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
-                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        <AlertTriangle className="w-3 h-3 text-amber-600" />
                         <span>Verification In Review</span>
                       </span>
                     )}
-                    <span className="text-xs font-semibold text-slate-600">
-                      ⭐ {profile?.rating || 5.0} • {profile?.completedAssignments || 0} missions
+                    <span className="text-xs text-slate-600 flex items-center gap-1">
+                      <Award className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Rating: {profile?.rating || 5.0} / 5.0 • {profile?.completedAssignments || 0} completed missions</span>
                     </span>
                   </div>
                 </div>
@@ -132,16 +133,16 @@ export default function VolunteerProfilePage() {
               {/* Form Settings */}
               <form onSubmit={handleSave} className="space-y-6">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-2">
-                    Resource Capabilities (Select what you can provide / haul)
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+                    Resource Capabilities (What you can supply or transport)
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     {[
-                      { id: "WATER", label: "Clean Water 💧" },
-                      { id: "FOOD", label: "Emergency Food 🍞" },
-                      { id: "TRANSPORT", label: "Emergency Transport 🚗" },
-                      { id: "SHELTER", label: "Shelter Gear 🏕️" },
-                      { id: "OTHER", label: "Other Supplies 📦" },
+                      { id: "WATER", label: "Clean Drinking Water" },
+                      { id: "FOOD", label: "Emergency Food" },
+                      { id: "TRANSPORT", label: "Relocation Transport" },
+                      { id: "SHELTER", label: "Shelter Gear" },
+                      { id: "OTHER", label: "General Supplies" },
                     ].map((c) => {
                       const isSelected = capabilities.includes(c.id as ResourceType);
                       return (
@@ -149,9 +150,9 @@ export default function VolunteerProfilePage() {
                           key={c.id}
                           type="button"
                           onClick={() => toggleCap(c.id as ResourceType)}
-                          className={`p-3 rounded-xl border text-xs font-bold text-left transition-all ${
+                          className={`p-3 rounded-lg border text-xs font-semibold text-left transition-all ${
                             isSelected
-                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                              ? "bg-slate-900 text-white border-slate-900 shadow-sm"
                               : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300"
                           }`}
                         >
@@ -164,8 +165,8 @@ export default function VolunteerProfilePage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Service Radius: <span className="text-blue-600">{radius} km</span>
+                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                      Operational Radius: <span className="text-blue-600 font-mono">{radius} km</span>
                     </label>
                     <input
                       type="range"
@@ -181,13 +182,13 @@ export default function VolunteerProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
                       Vehicle Capacity
                     </label>
                     <select
                       value={vehicle}
                       onChange={(e) => setVehicle(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 bg-white"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-white"
                     >
                       <option value="SUV / 4x4">SUV / 4x4</option>
                       <option value="Cargo Van">Cargo Van</option>
@@ -199,15 +200,15 @@ export default function VolunteerProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
                     Bio & Certifications
                   </label>
                   <textarea
                     rows={3}
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    placeholder="CERT trained, first aid responder, equipped with 4x4 chains..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="CERT trained, first aid responder, cargo van capacity..."
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -215,7 +216,7 @@ export default function VolunteerProfilePage() {
                   type="submit"
                   variant="primary"
                   size="md"
-                  className="font-bold"
+                  className="font-semibold"
                   isLoading={isSaving}
                 >
                   Save Dispatch Settings

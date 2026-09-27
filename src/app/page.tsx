@@ -8,7 +8,7 @@ import { EmergencyMap } from "@/components/map/EmergencyMap";
 import {
   ShieldAlert,
   ArrowRight,
-  Droplet,
+  Droplets,
   Utensils,
   Car,
   Home,
@@ -17,9 +17,10 @@ import {
   Users,
   Clock,
   Radio,
-  Sparkles,
   ShieldCheck,
   ChevronRight,
+  TrendingUp,
+  FileCheck,
 } from "lucide-react";
 import { EmergencyRequestData } from "@/types";
 
@@ -33,7 +34,6 @@ export default function LandingPage() {
   const [sampleRequests, setSampleRequests] = useState<EmergencyRequestData[]>([]);
 
   useEffect(() => {
-    // Fetch live overview metrics and sample requests
     fetch("/api/analytics/overview")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -54,31 +54,28 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Navbar />
 
       <main className="flex-1">
         {/* HERO SECTION */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-blue-950 via-slate-900 to-slate-900 text-white pt-16 pb-24 px-4 sm:px-6 lg:px-8">
-          {/* Subtle Ambient Background Gradients */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
-
+        <section className="relative overflow-hidden bg-slate-900 text-white pt-16 pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center max-w-3xl mx-auto mb-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-semibold mb-6">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Next-Gen Community Disaster Logistics</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs font-semibold mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>Community Emergency Resource Coordination Platform</span>
               </div>
 
-              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
                 When help is nearby,{" "}
-                <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+                <span className="text-blue-400">
                   make it reachable.
                 </span>
               </h1>
 
-              <p className="mt-6 text-base sm:text-lg text-slate-300 leading-relaxed">
-                ResQLink connects urgent non-medical community emergency resource requests with verified, location-aware volunteers based on algorithmic priority and real-time proximity.
+              <p className="mt-5 text-base sm:text-lg text-slate-300 leading-relaxed font-normal">
+                ResQLink connects verified community volunteers with households in urgent need of non-medical resources based on algorithmic priority, true travel distance, and vehicle capability.
               </p>
 
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -86,7 +83,7 @@ export default function LandingPage() {
                   <Button
                     size="lg"
                     variant="primary"
-                    className="w-full sm:w-auto font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/25"
+                    className="w-full sm:w-auto font-semibold bg-blue-600 hover:bg-blue-500 text-white"
                     rightIcon={<ArrowRight className="w-4 h-4" />}
                   >
                     Request Emergency Help
@@ -97,53 +94,40 @@ export default function LandingPage() {
                   <Button
                     size="lg"
                     variant="secondary"
-                    className="w-full sm:w-auto bg-slate-800/80 hover:bg-slate-700 text-white border-slate-700"
+                    className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
                     leftIcon={<ShieldCheck className="w-4 h-4 text-emerald-400" />}
                   >
-                    Become a Verified Volunteer
+                    Become a Volunteer
                   </Button>
-                </Link>
-              </div>
-
-              {/* Hackathon Demo Quick Access Callout */}
-              <div className="mt-8 p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/80 text-xs text-slate-300 max-w-xl mx-auto flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-left">
-                  <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <div>
-                    <span className="font-bold text-white">Hackathon Judges:</span> Instant demo logins active in top bar or button:
-                  </div>
-                </div>
-                <Link href="/login" className="font-bold text-blue-400 hover:text-blue-300 underline whitespace-nowrap">
-                  Demo Credentials &rarr;
                 </Link>
               </div>
             </div>
 
-            {/* LIVE EMERGENCY MAP VISUAL */}
-            <div className="mt-8 rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60 bg-slate-950">
+            {/* LIVE CRISIS GRID MAP VISUAL */}
+            <div className="mt-8 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl">
               <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 font-semibold text-slate-200">
+                <div className="flex items-center gap-2 font-medium text-slate-300">
                   <Radio className="w-4 h-4 text-red-500 animate-pulse" />
-                  <span>Live Operational Crisis Grid • San Francisco Metro Dispatch</span>
+                  <span>Tactical Incident Grid • San Francisco Metro Dispatch</span>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-mono text-[11px]">
-                  Real-time GPS Markers
+                <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono text-[11px] border border-slate-700">
+                  Active Dispatch Markers
                 </span>
               </div>
-              <EmergencyMap requests={sampleRequests} height="480px" />
+              <EmergencyMap requests={sampleRequests} height="460px" />
             </div>
           </div>
         </section>
 
         {/* LIVE METRICS COUNTERS */}
-        <section className="bg-white border-b border-slate-200 py-10 px-4 sm:px-6 lg:px-8">
+        <section className="bg-white border-b border-slate-200 py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <p className="text-3xl sm:text-4xl font-black text-rose-600 tracking-tight">
+                <p className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                   {metrics.activeRequests}
                 </p>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mt-1">
                   Active Requests
                 </p>
               </div>
@@ -152,7 +136,7 @@ export default function LandingPage() {
                 <p className="text-3xl sm:text-4xl font-black text-blue-600 tracking-tight">
                   {metrics.availableVolunteers}
                 </p>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mt-1">
                   Available Volunteers
                 </p>
               </div>
@@ -161,7 +145,7 @@ export default function LandingPage() {
                 <p className="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">
                   {metrics.resolvedRequests}
                 </p>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mt-1">
                   Requests Resolved
                 </p>
               </div>
@@ -170,7 +154,7 @@ export default function LandingPage() {
                 <p className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                   {metrics.avgResponseMinutes} min
                 </p>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mt-1">
                   Avg. Response Time
                 </p>
               </div>
@@ -178,157 +162,162 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* HOW IT WORKS SECTION */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-blue-600">
-              Protocol Workflow
+        {/* HOW IT WORKS */}
+        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+              Operational Protocol
             </span>
-            <h2 className="text-3xl font-extrabold text-slate-900 mt-2">
-              Four Steps From Crisis to Resolution
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5">
+              Structured Dispatch from Intake to Close
             </h2>
-            <p className="text-sm text-slate-600 mt-2">
-              Engineered for extreme reliability, transparency, and rapid community mobilization.
+            <p className="text-xs sm:text-sm text-slate-500 mt-2">
+              Replacing ad-hoc spreadsheets with transactional integrity and audited coordination.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[
               {
                 step: "01",
                 title: "Request Help",
-                desc: "Citizens submit urgent resource needs (water, food, transport, shelter). System automatically calculates an objective priority score.",
+                desc: "Citizens input verified resource requirements. An objective mathematical priority score is computed instantly.",
                 icon: Clock,
               },
               {
                 step: "02",
-                title: "Get Matched",
-                desc: "Matching algorithm scores candidate volunteers by real geographic distance, vehicle capability, and active workload.",
+                title: "Algorithmic Match",
+                desc: "Proximity engine ranks nearby verified volunteers based on Haversine distance, vehicle capacity, and workload.",
                 icon: Users,
               },
               {
                 step: "03",
-                title: "Receive Support",
-                desc: "Verified volunteer accepts the dispatch, starts transit, and delivers supplies with real-time status progression.",
+                title: "Fulfill Delivery",
+                desc: "Volunteers accept dispatches via database transactions and update telemetry as supplies are mobilized.",
                 icon: Car,
               },
               {
                 step: "04",
-                title: "Confirm Resolution",
-                desc: "Citizen confirms receipt of supplies to close the incident, update community impact metrics, and preserve audit trails.",
+                title: "Confirm Receipt",
+                desc: "Citizens confirm safe receipt of supplies to formally resolve the incident and record audit history.",
                 icon: CheckCircle2,
               },
             ].map((s) => (
               <div
                 key={s.step}
-                className="relative bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow"
+                className="relative bg-white rounded-xl p-5 border border-slate-200 shadow-sm"
               >
-                <span className="text-3xl font-black text-slate-200 absolute top-4 right-5">
+                <span className="text-2xl font-black text-slate-200 absolute top-4 right-4">
                   {s.step}
                 </span>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold mb-4">
-                  <s.icon className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold mb-3">
+                  <s.icon className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-2">{s.title}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{s.desc}</p>
+                <h3 className="text-sm font-bold text-slate-900 mb-1.5">{s.title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* SUPPORTED RESOURCE TYPES */}
-        <section className="bg-slate-100/70 border-t border-b border-slate-200 py-16 px-4 sm:px-6 lg:px-8">
+        <section className="bg-slate-100/60 border-t border-b border-slate-200 py-14 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center max-w-xl mx-auto mb-10">
-              <h2 className="text-2xl font-bold text-slate-900">
-                Non-Medical Emergency Resources
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <h2 className="text-xl font-bold text-slate-900">
+                Coordinated Emergency Resources
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Connecting community stockpiles and volunteer capacities with households in need
+                Standardized non-medical emergency supply categories
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {[
-                { title: "Clean Water", emoji: "💧", count: "Gallons, filtration, purification packs" },
-                { title: "Food Supplies", emoji: "🍞", count: "Ready meals, baby formula, dry rations" },
-                { title: "Transport", emoji: "🚗", count: "Evacuation, high-ground shuttles, 4x4 access" },
-                { title: "Temporary Shelter", emoji: "🏕️", count: "Tarps, tents, cots, thermal blankets" },
-                { title: "Other Supplies", emoji: "📦", count: "Flashlights, batteries, hygiene kits" },
-              ].map((r) => (
-                <div key={r.title} className="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-sm">
-                  <div className="text-3xl mb-2">{r.emoji}</div>
-                  <h4 className="font-bold text-sm text-slate-900">{r.title}</h4>
-                  <p className="text-[11px] text-slate-500 mt-1">{r.count}</p>
-                </div>
-              ))}
+                { title: "Clean Water", icon: Droplets, count: "Potable gallons, bottles, purification packs" },
+                { title: "Food Supplies", icon: Utensils, count: "Ready meals, infant formula, dry rations" },
+                { title: "Relocation Transport", icon: Car, count: "Non-medical evacuation, high-ground transfer" },
+                { title: "Temporary Shelter", icon: Home, count: "Tarpaulins, emergency tents, blankets, cots" },
+                { title: "General Supplies", icon: Package, count: "Flashlights, hygiene kits, power banks" },
+              ].map((r) => {
+                const Icon = r.icon;
+                return (
+                  <div key={r.title} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-left">
+                    <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-700 flex items-center justify-center mb-2.5">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-900">{r.title}</h4>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-snug">{r.count}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
 
         {/* WHY RESQLINK */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
-              <span className="text-xs font-extrabold uppercase tracking-wider text-blue-600">
-                Startup Grade Architecture
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                Enterprise Reliability
               </span>
-              <h2 className="text-3xl font-extrabold text-slate-900 mt-2 leading-tight">
-                Built to outperform ad-hoc spreadsheets and chaotic chat groups.
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 leading-tight">
+                Engineered for rapid crisis coordination without operational friction.
               </h2>
-              <p className="text-sm text-slate-600 mt-4 leading-relaxed">
-                During crisis events, informal coordination groups crumble under duplicate requests, out-of-order deliveries, and zero accountability. ResQLink implements institutional-grade dispatch protocols:
+              <p className="text-xs sm:text-sm text-slate-600 mt-3 leading-relaxed">
+                Informal disaster groups collapse under duplicate tickets and unverifiable claims. ResQLink introduces deterministic state transitions and verified operational safety:
               </p>
 
-              <div className="mt-6 space-y-4">
+              <div className="mt-6 space-y-3.5">
                 {[
                   {
-                    title: "Strict Identity & Background Verification",
-                    desc: "Volunteers must be validated by operational admins before they can accept emergency assignments.",
+                    title: "Identity & Background Verification",
+                    desc: "Community responders are validated by operations commanders before receiving dispatch authorization.",
                   },
                   {
-                    title: "Location-Aware Haversine Matching Engine",
-                    desc: "Volunteers are matched based on true travel distance, service radius limits, and specific vehicle capacities.",
+                    title: "Haversine Distance Matching Algorithm",
+                    desc: "Matches evaluate travel distance, vehicle capacity constraints, and current active responder workload.",
                   },
                   {
-                    title: "Objective Priority Scoring Algorithm",
-                    desc: "Urgency is mathematically weighted against vulnerable populations and critical resource requirements.",
+                    title: "Objective Priority Scoring Engine",
+                    desc: "Urgency is mathematically calculated against population exposure and resource survival criticality.",
                   },
                   {
-                    title: "Immutable Audit Trails & Dual Confirmation",
-                    desc: "Deliveries must be confirmed by the citizen recipient before an incident can be resolved.",
+                    title: "Dual Confirmation Closing Protocol",
+                    desc: "Deliveries must be confirmed by the citizen recipient before an incident can be marked resolved.",
                   },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                  <div key={idx} className="flex items-start gap-2.5">
+                    <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-slate-900">{item.title}</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl border border-slate-800">
-              <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-blue-400" />
-                <span>Command Center Architecture</span>
+            <div className="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800 shadow-xl">
+              <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-blue-400" />
+                <span>Command Protocol Pipeline</span>
               </h3>
-              <div className="space-y-3 font-mono text-xs">
-                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
-                  <span className="text-blue-400">1. Ingestion:</span> Zod schema validation & duplicate prevention
+              <div className="space-y-2.5 font-mono text-xs">
+                <div className="p-3 rounded-lg bg-slate-800 border border-slate-700">
+                  <span className="text-blue-400 font-bold">1. Intake Validation:</span> Zod strict validation & duplicate suppression
                 </div>
-                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
-                  <span className="text-amber-400">2. Priority Engine:</span> Urgency (40%) + Vulnerability (30%) + Resource (20%) + Aging (10%)
+                <div className="p-3 rounded-lg bg-slate-800 border border-slate-700">
+                  <span className="text-orange-400 font-bold">2. Priority Engine:</span> Urgency (40%) + Vulnerability (30%) + Resource (20%) + Aging (10%)
                 </div>
-                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
-                  <span className="text-emerald-400">3. Matching Engine:</span> Distance radius + Workload penalty + Capabilities filter
+                <div className="p-3 rounded-lg bg-slate-800 border border-slate-700">
+                  <span className="text-emerald-400 font-bold">3. Matching Engine:</span> Great-Circle distance radius + Workload penalty
                 </div>
-                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
-                  <span className="text-indigo-400">4. Lifecycle State Machine:</span> Database transactional isolation guards against race conditions
+                <div className="p-3 rounded-lg bg-slate-800 border border-slate-700">
+                  <span className="text-indigo-400 font-bold">4. Lifecycle Isolation:</span> ACID database transactions prevent double assignment
                 </div>
               </div>
             </div>
@@ -336,16 +325,16 @@ export default function LandingPage() {
         </section>
 
         {/* FINAL CTA */}
-        <section className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white py-16 px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-extrabold">Need Help in an Emergency?</h2>
-            <p className="mt-3 text-slate-200 text-sm">
-              Submit your resource requirement right now. Our community response system connects you with verified nearby volunteers within minutes.
+        <section className="bg-slate-900 text-white py-14 px-4 sm:px-6 lg:px-8 text-center border-t border-slate-800">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-extrabold">Need Help in an Emergency?</h2>
+            <p className="mt-2 text-slate-300 text-xs sm:text-sm">
+              Submit your resource requirement right now. Our community response system connects you with verified nearby volunteers.
             </p>
-            <div className="mt-8 flex justify-center gap-4">
+            <div className="mt-6 flex justify-center">
               <Link href="/citizen">
-                <Button size="lg" variant="primary" className="bg-white text-blue-900 hover:bg-slate-100 font-bold shadow-lg">
-                  Request Assistance Now
+                <Button size="lg" variant="primary" className="bg-blue-600 hover:bg-blue-500 text-white font-semibold">
+                  Request Assistance
                 </Button>
               </Link>
             </div>
@@ -353,15 +342,15 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="bg-slate-950 text-slate-400 py-8 px-4 text-xs border-t border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="bg-slate-950 text-slate-400 py-6 px-4 text-xs border-t border-slate-800">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-blue-500" />
             <span className="font-bold text-white">ResQLink Emergency Systems</span>
             <span>&copy; {new Date().getFullYear()}</span>
           </div>
-          <p className="text-slate-500 text-[11px]">
-            Designed for Hackathon Demonstration • Community Emergency Resource Coordination Platform
+          <p className="text-slate-500">
+            Enterprise Community Emergency Resource Coordination Platform
           </p>
         </div>
       </footer>

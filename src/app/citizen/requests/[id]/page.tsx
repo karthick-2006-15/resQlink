@@ -20,6 +20,7 @@ import {
   Truck,
   CheckCircle2,
   Share2,
+  Star,
 } from "lucide-react";
 import { EmergencyRequestData, AuditLogData } from "@/types";
 import { toast } from "sonner";
@@ -263,9 +264,12 @@ export default function RequestTrackingPage() {
 
                   {volunteer.volunteerProfile && (
                     <div className="space-y-1.5 text-xs text-slate-600 pt-2 border-t border-slate-100">
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center">
                         <span className="text-slate-400">Rating:</span>
-                        <span className="font-bold text-slate-900">⭐ {volunteer.volunteerProfile.rating} / 5.0</span>
+                        <span className="font-bold text-slate-900 inline-flex items-center gap-1">
+                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                          {volunteer.volunteerProfile.rating} / 5.0
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Completed Missions:</span>

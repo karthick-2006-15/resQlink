@@ -84,7 +84,7 @@ export class RequestService {
 
     // Notify admins about new request (urgent if critical or high)
     await NotificationService.broadcastToAdmins({
-      title: `${priorityLevel === "CRITICAL" ? "🔴 URGENT: " : "⚠️ "}New Emergency Request`,
+      title: `${priorityLevel === "CRITICAL" ? "URGENT: " : "High Priority: "}New Emergency Request`,
       message: `${request.requester.name} requested ${input.quantity} of ${input.resourceType} for ${input.peopleAffected} people.`,
       type: priorityLevel === "CRITICAL" ? "URGENT" : "WARNING",
       link: `/admin/requests?id=${request.id}`,
@@ -448,8 +448,8 @@ export class RequestService {
         await tx.notification.create({
           data: {
             userId: latestAssignment.volunteerId,
-            title: "Delivery Confirmed & Resolved! 🎉",
-            message: `The citizen confirmed receipt of ${request.resourceType}. Thank you for your service to the community!`,
+            title: "Delivery Confirmed & Resolved",
+            message: `The citizen confirmed receipt of ${request.resourceType}. Thank you for your service to the community.`,
             type: "SUCCESS",
             link: `/volunteer/assignments`,
           },
@@ -505,7 +505,7 @@ export class RequestService {
     });
 
     await NotificationService.broadcastToAdmins({
-      title: "🚨 Delivery Dispute Reported",
+      title: "Delivery Dispute Reported",
       message: `Citizen reported an issue with request ${params.requestId}: "${params.reason}"`,
       type: "URGENT",
       link: `/admin/requests?id=${params.requestId}`,

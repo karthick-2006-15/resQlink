@@ -26,6 +26,7 @@ import {
   Users,
   Award,
   ShieldCheck,
+  Star,
 } from "lucide-react";
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -238,8 +239,10 @@ export default function AdminAnalyticsPage() {
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-slate-900">{vol.name}</h4>
-                        <span className="text-[11px] text-slate-400">
-                          Radius: {vol.serviceRadiusKm} km • Rating: ⭐ {vol.rating}
+                        <span className="text-[11px] text-slate-400 inline-flex items-center gap-1">
+                          Radius: {vol.serviceRadiusKm} km • Rating:
+                          <Star className="w-3 h-3 fill-amber-400 text-amber-500 inline" />
+                          <span className="font-semibold text-slate-700">{vol.rating}</span>
                         </span>
                       </div>
                     </div>

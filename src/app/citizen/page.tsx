@@ -90,11 +90,11 @@ export default function CitizenDashboard() {
             <Button
               variant="primary"
               size="lg"
-              className="font-bold shadow-lg shadow-blue-500/20"
-              leftIcon={<Plus className="w-5 h-5" />}
+              className="font-semibold shadow-sm"
+              leftIcon={<Plus className="w-4 h-4" />}
               onClick={() => setIsCreateOpen(true)}
             >
-              + Request Emergency Help
+              Request Emergency Help
             </Button>
           </div>
 
@@ -200,10 +200,11 @@ export default function CitizenDashboard() {
                 <Button
                   variant="primary"
                   size="sm"
-                  className="mt-4 font-bold"
+                  className="mt-4 font-semibold"
+                  leftIcon={<Plus className="w-4 h-4" />}
                   onClick={() => setIsCreateOpen(true)}
                 >
-                  + Create Emergency Request
+                  Create Emergency Request
                 </Button>
               </div>
             ) : (

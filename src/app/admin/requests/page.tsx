@@ -14,8 +14,6 @@ import {
   Filter,
   ShieldCheck,
   Zap,
-  ArrowUpDown,
-  UserCheck,
   Sparkles,
   ExternalLink,
   Clock,
@@ -153,7 +151,7 @@ export default function AdminRequestsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Navbar />
 
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
@@ -173,15 +171,15 @@ export default function AdminRequestsPage() {
           </div>
 
           {/* Search & Multi-Filters Bar */}
-          <div className="bg-white p-4 rounded-3xl border border-slate-200 mb-6 shadow-sm flex flex-col md:flex-row gap-3">
+          <div className="bg-white p-3.5 rounded-2xl border border-slate-200 mb-6 shadow-sm flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search ID, title, or street address..."
-                className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full pl-10 pr-3.5 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -189,7 +187,7 @@ export default function AdminRequestsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-slate-50"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="PENDING">Pending</option>
@@ -203,7 +201,7 @@ export default function AdminRequestsPage() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-slate-50"
               >
                 <option value="ALL">All Priorities</option>
                 <option value="CRITICAL">Critical</option>
@@ -214,74 +212,74 @@ export default function AdminRequestsPage() {
               <select
                 value={resourceFilter}
                 onChange={(e) => setResourceFilter(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-slate-50"
               >
                 <option value="ALL">All Resources</option>
-                <option value="WATER">Water 💧</option>
-                <option value="FOOD">Food 🍞</option>
-                <option value="TRANSPORT">Transport 🚗</option>
-                <option value="SHELTER">Shelter 🏕️</option>
-                <option value="OTHER">Other 📦</option>
+                <option value="WATER">Water</option>
+                <option value="FOOD">Food</option>
+                <option value="TRANSPORT">Transport</option>
+                <option value="SHELTER">Shelter</option>
+                <option value="OTHER">Supplies</option>
               </select>
             </div>
           </div>
 
           {/* Desktop Table View */}
-          <div className="hidden md:block bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+          <div className="hidden md:block bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
                   <tr>
-                    <th className="py-3.5 px-4">Resource & ID</th>
-                    <th className="py-3.5 px-4">Title & Details</th>
-                    <th className="py-3.5 px-4">Priority</th>
-                    <th className="py-3.5 px-4">Status</th>
-                    <th className="py-3.5 px-4">Location</th>
-                    <th className="py-3.5 px-4">Assigned Responder</th>
-                    <th className="py-3.5 px-4 text-right">Actions</th>
+                    <th className="py-3 px-4">Resource & ID</th>
+                    <th className="py-3 px-4">Title & Details</th>
+                    <th className="py-3 px-4">Priority</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4">Location</th>
+                    <th className="py-3 px-4">Assigned Responder</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={7} className="py-12 text-center text-slate-400">
+                      <td colSpan={7} className="py-12 text-center text-slate-400 font-sans">
                         Loading requests registry...
                       </td>
                     </tr>
                   ) : filtered.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="py-12 text-center text-slate-400">
+                      <td colSpan={7} className="py-12 text-center text-slate-400 font-sans">
                         No requests match current filters.
                       </td>
                     </tr>
                   ) : (
                     filtered.map((req) => (
                       <tr key={req.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3.5 px-4">
+                        <td className="py-3 px-4">
                           <div className="space-y-1">
                             <ResourceBadge type={req.resourceType} />
                             <p className="text-[10px] font-mono text-slate-400">{req.id.slice(0, 10)}...</p>
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 max-w-xs">
-                          <p className="font-bold text-slate-900 truncate">{req.title}</p>
+                        <td className="py-3 px-4 max-w-xs">
+                          <p className="font-semibold text-slate-900 truncate">{req.title}</p>
                           <p className="text-[11px] text-slate-500 mt-0.5">
-                            {req.quantity} • {req.peopleAffected} people
+                            {req.quantity} • {req.peopleAffected} individuals
                           </p>
                         </td>
-                        <td className="py-3.5 px-4">
+                        <td className="py-3 px-4">
                           <PriorityBadge level={req.priorityLevel} size="sm" />
                           <span className="text-[10px] text-slate-400 block mt-0.5 font-mono">
                             {req.priorityScore} pts
                           </span>
                         </td>
-                        <td className="py-3.5 px-4">
+                        <td className="py-3 px-4">
                           <StatusBadge status={req.status} size="sm" />
                         </td>
-                        <td className="py-3.5 px-4 max-w-xs truncate">
+                        <td className="py-3 px-4 max-w-xs truncate">
                           <span className="text-xs truncate block">{req.address}</span>
                         </td>
-                        <td className="py-3.5 px-4">
+                        <td className="py-3 px-4">
                           {req.currentAssignment?.volunteer ? (
                             <span className="font-semibold text-slate-900">
                               {req.currentAssignment.volunteer.name}
@@ -290,7 +288,7 @@ export default function AdminRequestsPage() {
                             <span className="text-slate-400 italic">Unassigned</span>
                           )}
                         </td>
-                        <td className="py-3.5 px-4 text-right">
+                        <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             {req.status === "PENDING" && (
                               <Button
@@ -302,12 +300,11 @@ export default function AdminRequestsPage() {
                               </Button>
                             )}
 
-                            {/* Match Engine Recommendation Trigger */}
                             {["PENDING", "VERIFIED", "MATCHING"].includes(req.status) && (
                               <Button
                                 size="sm"
                                 variant="secondary"
-                                leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber-500" />}
+                                leftIcon={<Sparkles className="w-3.5 h-3.5 text-blue-600" />}
                                 onClick={() => handleOpenMatchingModal(req)}
                                 title="Run Matching Engine to find and assign volunteers"
                               >
@@ -339,15 +336,15 @@ export default function AdminRequestsPage() {
           </div>
 
           {/* Mobile Card View */}
-          <div className="md:hidden space-y-4">
+          <div className="md:hidden space-y-3">
             {filtered.map((req) => (
-              <div key={req.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+              <div key={req.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
                 <div className="flex items-center justify-between">
                   <ResourceBadge type={req.resourceType} />
                   <StatusBadge status={req.status} size="sm" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900">{req.title}</h4>
+                  <h4 className="font-bold text-slate-900 text-sm">{req.title}</h4>
                   <p className="text-xs text-slate-500 mt-0.5">{req.quantity} • {req.address}</p>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100">
@@ -385,30 +382,30 @@ export default function AdminRequestsPage() {
           description={`Override computed score for: ${priorityModalReq.title}`}
           maxWidth="sm"
         >
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2.5 pt-2">
             <Button
               variant="danger"
               size="md"
-              className="w-full justify-between"
+              className="w-full justify-between font-semibold"
               onClick={() => handleChangePriority("CRITICAL")}
             >
-              <span>🔴 CRITICAL (Immediate Dispatch)</span>
+              <span>CRITICAL (Immediate Dispatch)</span>
             </Button>
             <Button
               variant="secondary"
               size="md"
-              className="w-full justify-between border-orange-300 text-orange-900 bg-orange-50"
+              className="w-full justify-between border-orange-300 text-orange-900 bg-orange-50 font-semibold"
               onClick={() => handleChangePriority("HIGH")}
             >
-              <span>🟠 HIGH (Urgent Need)</span>
+              <span>HIGH (Urgent Need)</span>
             </Button>
             <Button
               variant="outline"
               size="md"
-              className="w-full justify-between"
+              className="w-full justify-between font-semibold"
               onClick={() => handleChangePriority("NORMAL")}
             >
-              <span>🟡 NORMAL (Standard Response)</span>
+              <span>NORMAL (Standard Response)</span>
             </Button>
           </div>
         </Modal>
@@ -419,19 +416,19 @@ export default function AdminRequestsPage() {
         <Modal
           isOpen={true}
           onClose={() => setMatchModalReq(null)}
-          title="Matching Engine: Candidate Volunteers"
-          description={`Ranked community responders for ${matchModalReq.resourceType} in ${matchModalReq.address}`}
+          title="Matching Engine: Candidate Responders"
+          description={`Ranked volunteers for ${matchModalReq.resourceType} in ${matchModalReq.address}`}
           maxWidth="xl"
         >
           <div className="space-y-4">
             {isLoadingMatches ? (
               <div className="py-12 text-center text-slate-500 space-y-2">
-                <Sparkles className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
-                <p className="text-sm font-bold">Computing candidate volunteer match scores...</p>
+                <Sparkles className="w-6 h-6 text-blue-600 animate-spin mx-auto" />
+                <p className="text-sm font-semibold">Computing candidate volunteer match scores...</p>
                 <p className="text-xs text-slate-400">Evaluating travel distance, radius, vehicle capacity & workload</p>
               </div>
             ) : matches.length === 0 ? (
-              <div className="p-8 bg-slate-50 rounded-2xl text-center text-xs text-slate-500">
+              <div className="p-8 bg-slate-50 rounded-xl text-center text-xs text-slate-500">
                 <p className="font-semibold text-slate-700">No verified volunteers found in radius</p>
                 <p className="text-slate-400 mt-1">
                   Ensure available volunteers have capability for &quot;{matchModalReq.resourceType}&quot; and are within travel radius.
@@ -442,27 +439,27 @@ export default function AdminRequestsPage() {
                 {matches.map((cand, idx) => (
                   <div
                     key={cand.volunteer.id}
-                    className="p-4 rounded-2xl border border-slate-200 bg-white hover:border-blue-400 transition-colors shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                    className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-blue-400 transition-colors shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black flex items-center justify-center">
+                        <span className="w-5 h-5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold flex items-center justify-center">
                           #{idx + 1}
                         </span>
                         <h4 className="font-bold text-sm text-slate-900">{cand.volunteer.user.name}</h4>
-                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] font-bold rounded-full">
+                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] font-semibold rounded">
                           Match Score: {cand.matchScore}%
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
-                        <span className="font-bold text-blue-600">{cand.distanceKm} km away</span>
+                      <div className="flex items-center gap-2.5 text-xs text-slate-500 mt-1">
+                        <span className="font-semibold text-blue-600">{cand.distanceKm} km away</span>
                         <span>•</span>
-                        <span>⭐ {cand.volunteer.rating}</span>
+                        <span>Rating: {cand.volunteer.rating} / 5.0</span>
                         <span>•</span>
-                        <span>{cand.volunteer.completedAssignments} completed missions</span>
+                        <span>{cand.volunteer.completedAssignments} completed</span>
                         <span>•</span>
-                        <span>Vehicle: {cand.volunteer.vehicleType || "Car"}</span>
+                        <span>{cand.volunteer.vehicleType || "Car"}</span>
                       </div>
 
                       <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-1 font-mono">
