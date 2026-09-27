@@ -97,7 +97,7 @@ export function Sidebar({ role }: SidebarProps) {
           <span>Life Safety Notice</span>
         </div>
         <p className="text-[11px] text-slate-300 mt-1 leading-snug">
-          ResQLink coordinates non-medical resources. For medical or fire emergencies, immediately dial 911.
+          ResQLink coordinates non-medical resources. For medical or fire emergencies, immediately dial 108.
         </p>
       </div>
     </aside>
