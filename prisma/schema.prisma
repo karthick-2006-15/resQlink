@@ -1,0 +1,163 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String            @id @default(cuid())
+  email           String            @unique
+  name            String
+  password        String
+  role            String            @default("CITIZEN") // CITIZEN, VOLUNTEER, ADMIN
+  phone           String?
+  address         String?
+  latitude        Float?
+  longitude       Float?
+  avatar          String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  volunteerProfile VolunteerProfile?
+  requestsCreated  EmergencyRequest[] @relation("CitizenRequests")
+  assignments      Assignment[]       @relation("VolunteerAssignments")
+  notifications    Notification[]
+  disputesReported DeliveryDispute[]  @relation("DisputeReporter")
+
+  @@index([email])
+  @@index([role])
+}
+
+model VolunteerProfile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isVerified           Boolean   @default(false)
+  isAvailable          Boolean   @default(true)
+  serviceRadiusKm      Float     @default(10.0)
+  capabilities         String    @default("[\"WATER\",\"FOOD\"]") // JSON array string
+  latitude             Float     @default(37.7749) // SF metro / customizable
+  longitude            Float     @default(-122.4194)
+  address              String?
+  completedAssignments Int       @default(0)
+  rating               Float     @default(5.0)
+  bio                  String?
+  vehicleType          String?   // Car, Truck, Bike, On Foot, Van
+  verifiedAt           DateTime?
+  rejectedAt           DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([isVerified])
+  @@index([isAvailable])
+  @@index([latitude, longitude])
+}
+
+model EmergencyRequest {
+  id                 String          @id @default(cuid())
+  requesterId        String
+  requester          User            @relation("CitizenRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+  resourceType       String          // WATER, FOOD, TRANSPORT, SHELTER, OTHER
+  title              String
+  description        String
+  quantity           String          // e.g. "10 packets", "20 gallons"
+  peopleAffected     Int             @default(1)
+  urgency            String          @default("NORMAL") // NORMAL, HIGH, CRITICAL
+  priorityScore      Float           @default(50.0)     // Calculated 0-100
+  priorityLevel      String          @default("NORMAL") // NORMAL, HIGH, CRITICAL
+  status             String          @default("PENDING") // PENDING, VERIFIED, MATCHING, ASSIGNED, IN_PROGRESS, DELIVERED, CONFIRMED, CLOSED, REJECTED, CANCELLED
+  address            String
+  latitude           Float
+  longitude          Float
+  imageUrl           String?
+  verifiedByAdminId  String?
+  verifiedAt         DateTime?
+  assignedAt         DateTime?
+  deliveredAt        DateTime?
+  confirmedAt        DateTime?
+  closedAt           DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  assignments        Assignment[]
+  disputes           DeliveryDispute[]
+
+  @@index([status])
+  @@index([priorityLevel])
+  @@index([resourceType])
+  @@index([latitude, longitude])
+  @@index([createdAt])
+}
+
+model Assignment {
+  id           String            @id @default(cuid())
+  requestId    String
+  request      EmergencyRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  volunteerId  String
+  volunteer    User              @relation("VolunteerAssignments", fields: [volunteerId], references: [id], onDelete: Cascade)
+  status       String            @default("ASSIGNED") // ASSIGNED, IN_PROGRESS, DELIVERED, CONFIRMED, CANCELLED
+  notes        String?
+  acceptedAt   DateTime          @default(now())
+  startedAt    DateTime?
+  deliveredAt  DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([requestId])
+  @@index([volunteerId])
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, SUCCESS, WARNING, URGENT
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorName  String
+  actorRole  String
+  action     String   // VOLUNTEER_VERIFIED, REQUEST_VERIFIED, PRIORITY_CHANGED, VOLUNTEER_ASSIGNED, etc.
+  entity     String   // EmergencyRequest, VolunteerProfile, Assignment, etc.
+  entityId   String
+  oldValue   String?
+  newValue   String?
+  ipAddress  String?
+  timestamp  DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([actorId])
+  @@index([timestamp])
+}
+
+model DeliveryDispute {
+  id              String           @id @default(cuid())
+  requestId       String
+  request         EmergencyRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  reporterId      String
+  reporter        User             @relation("DisputeReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reason          String
+  status          String           @default("PENDING") // PENDING, RESOLVED, DISMISSED
+  resolutionNotes String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([requestId])
+  @@index([status])
+}
