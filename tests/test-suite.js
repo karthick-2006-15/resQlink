@@ -16,9 +16,9 @@ function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
   return Math.round(R * c * 10) / 10;
 }
 
-// Priority calculation
+// Priority calculation with wait-time aging factor
 function calculatePriority(input) {
-  const { urgency, peopleAffected, resourceType } = input;
+  const { urgency, peopleAffected, resourceType, waitHours = 0 } = input;
   let urgencyScore = 15;
   if (urgency === "CRITICAL") urgencyScore = 40;
   else if (urgency === "HIGH") urgencyScore = 28;
@@ -36,7 +36,9 @@ function calculatePriority(input) {
   else if (resourceType === "TRANSPORT") resourceScore = 12;
   else resourceScore = 8;
 
-  const totalRaw = urgencyScore + peopleScore + resourceScore;
+  const waitScore = Math.min(10, Math.floor(Math.max(0, waitHours) * 2.5));
+
+  const totalRaw = urgencyScore + peopleScore + resourceScore + waitScore;
   const priorityScore = Math.min(100, Math.max(10, totalRaw));
 
   let priorityLevel = "NORMAL";
@@ -46,7 +48,7 @@ function calculatePriority(input) {
     priorityLevel = "HIGH";
   }
 
-  return { priorityScore, priorityLevel };
+  return { priorityScore, priorityLevel, breakdown: { urgencyScore, peopleScore, resourceScore, waitScore } };
 }
 
 // Matching Filter & Rank
@@ -71,18 +73,21 @@ function filterAndRankCandidates(request, volunteers) {
     candidates.push({ volunteer: vol, distance, score });
   }
 
-  return candidates.sort((a, b) => b.score - a.score);
+  return candidates.sort((a, b) => b.score - a.score || a.distance - b.distance);
 }
 
 // Valid transitions
 const VALID_TRANSITIONS = {
   PENDING: ["VERIFIED", "REJECTED", "CANCELLED"],
   VERIFIED: ["MATCHING", "ASSIGNED", "CANCELLED"],
-  ASSIGNED: ["IN_PROGRESS", "CANCELLED"],
+  MATCHING: ["ASSIGNED", "CANCELLED"],
+  ASSIGNED: ["IN_PROGRESS", "CANCELLED", "MATCHING"],
   IN_PROGRESS: ["DELIVERED", "CANCELLED"],
-  DELIVERED: ["CONFIRMED", "CLOSED"],
+  DELIVERED: ["CONFIRMED", "CLOSED", "IN_PROGRESS"],
   CONFIRMED: ["CLOSED"],
   CLOSED: [],
+  REJECTED: [],
+  CANCELLED: [],
 };
 
 function isValidTransition(from, to) {
@@ -110,16 +115,16 @@ async function runTests() {
   console.log("\n[TEST 2] Matching Engine Filters");
   const testReq = {
     resourceType: "WATER",
-    latitude: 37.7749,
-    longitude: -122.4194,
+    latitude: 13.0827,
+    longitude: 80.2707,
   };
 
   const sampleVolunteers = [
-    { id: "1", name: "Eligible Near", isVerified: true, isAvailable: true, capabilities: ["WATER"], latitude: 37.78, longitude: -122.41, serviceRadiusKm: 5 },
-    { id: "2", name: "Unverified", isVerified: false, isAvailable: true, capabilities: ["WATER"], latitude: 37.78, longitude: -122.41, serviceRadiusKm: 5 },
-    { id: "3", name: "Unavailable", isVerified: true, isAvailable: false, capabilities: ["WATER"], latitude: 37.78, longitude: -122.41, serviceRadiusKm: 5 },
-    { id: "4", name: "Wrong Resource", isVerified: true, isAvailable: true, capabilities: ["TRANSPORT"], latitude: 37.78, longitude: -122.41, serviceRadiusKm: 5 },
-    { id: "5", name: "Out of Radius", isVerified: true, isAvailable: true, capabilities: ["WATER"], latitude: 37.95, longitude: -122.10, serviceRadiusKm: 5 },
+    { id: "1", name: "Eligible Near", isVerified: true, isAvailable: true, capabilities: ["WATER"], latitude: 13.085, longitude: 80.272, serviceRadiusKm: 5 },
+    { id: "2", name: "Unverified", isVerified: false, isAvailable: true, capabilities: ["WATER"], latitude: 13.085, longitude: 80.272, serviceRadiusKm: 5 },
+    { id: "3", name: "Unavailable", isVerified: true, isAvailable: false, capabilities: ["WATER"], latitude: 13.085, longitude: 80.272, serviceRadiusKm: 5 },
+    { id: "4", name: "Wrong Resource", isVerified: true, isAvailable: true, capabilities: ["TRANSPORT"], latitude: 13.085, longitude: 80.272, serviceRadiusKm: 5 },
+    { id: "5", name: "Out of Radius", isVerified: true, isAvailable: true, capabilities: ["WATER"], latitude: 13.95, longitude: 80.80, serviceRadiusKm: 5 },
   ];
 
   const matched = filterAndRankCandidates(testReq, sampleVolunteers);
@@ -134,10 +139,12 @@ async function runTests() {
   assert.strictEqual(isValidTransition("ASSIGNED", "IN_PROGRESS"), true);
   assert.strictEqual(isValidTransition("IN_PROGRESS", "DELIVERED"), true);
   assert.strictEqual(isValidTransition("DELIVERED", "CONFIRMED"), true);
-  // Invalid jumps
+  assert.strictEqual(isValidTransition("CONFIRMED", "CLOSED"), true);
+  // Invalid jumps blocked
   assert.strictEqual(isValidTransition("PENDING", "CLOSED"), false);
   assert.strictEqual(isValidTransition("ASSIGNED", "CONFIRMED"), false);
   assert.strictEqual(isValidTransition("CLOSED", "PENDING"), false);
+  assert.strictEqual(isValidTransition("DELIVERED", "ASSIGNED"), false);
   console.log("  ✓ State machine rules enforced: Valid transitions allowed, invalid jumps blocked");
 
   // 4. Password Hashing Security Test
@@ -147,8 +154,36 @@ async function runTests() {
   assert.strictEqual(await bcrypt.compare("wrongSecret", hashed), false);
   console.log("  ✓ Bcrypt password hashing and validation verified");
 
+  // 5. Geolocation Calculation Accuracy
+  console.log("\n[TEST 5] Haversine Distance Geolocation Engine");
+  // Chennai (13.0827, 80.2707) to Tambaram (12.9249, 80.1000) is approx 24-25 km
+  const dist = calculateHaversineDistance(13.0827, 80.2707, 12.9249, 80.1000);
+  assert.ok(dist >= 23 && dist <= 27, `Distance ${dist}km should be between 23 and 27 km`);
+  // Same coordinate should yield 0 km
+  const sameDist = calculateHaversineDistance(13.0827, 80.2707, 13.0827, 80.2707);
+  assert.strictEqual(sameDist, 0);
+  console.log(`  ✓ Haversine distance validated (Chennai to Tambaram: ${dist} km, Zero-distance: ${sameDist} km)`);
+
+  // 6. Starvation Prevention Aging Factor
+  console.log("\n[TEST 6] Priority Wait-Time Aging & Starvation Prevention");
+  const freshRequest = calculatePriority({ urgency: "NORMAL", peopleAffected: 2, resourceType: "FOOD", waitHours: 0 });
+  const agedRequest = calculatePriority({ urgency: "NORMAL", peopleAffected: 2, resourceType: "FOOD", waitHours: 4 });
+  assert.ok(agedRequest.priorityScore > freshRequest.priorityScore, "Aged request must receive aging bonus");
+  assert.strictEqual(agedRequest.breakdown.waitScore, 10, "4 hours aging must cap at max 10 pts");
+  console.log(`  ✓ Aging factor confirmed: 0h wait score=${freshRequest.priorityScore} -> 4h aged score=${agedRequest.priorityScore} (+${agedRequest.breakdown.waitScore} pts)`);
+
+  // 7. Ranking Tiebreaker by Distance
+  console.log("\n[TEST 7] Candidate Ranking Order and Distance Tiebreaking");
+  const candidatesList = [
+    { id: "v1", name: "Farther Volunteer", isVerified: true, isAvailable: true, capabilities: ["WATER"], latitude: 13.090, longitude: 80.280, serviceRadiusKm: 10 },
+    { id: "v2", name: "Closer Volunteer", isVerified: true, isAvailable: true, capabilities: ["WATER"], latitude: 13.083, longitude: 80.271, serviceRadiusKm: 10 },
+  ];
+  const ranked = filterAndRankCandidates(testReq, candidatesList);
+  assert.strictEqual(ranked[0].volunteer.name, "Closer Volunteer");
+  console.log(`  ✓ Closest candidate prioritized first: ${ranked[0].volunteer.name} (${ranked[0].distance} km) over ${ranked[1].volunteer.name} (${ranked[1].distance} km)`);
+
   console.log("\n==============================================");
-  console.log("  ALL TESTS PASSED SUCCESSFULLY! (4/4 test suites)");
+  console.log("  ALL TESTS PASSED SUCCESSFULLY! (7/7 test suites)");
   console.log("==============================================\n");
 }
 

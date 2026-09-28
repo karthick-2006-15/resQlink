@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { calculateHaversineDistance } from "@/lib/services/matching.service";
 import { ResourceType } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser(req);

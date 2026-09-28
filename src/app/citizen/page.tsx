@@ -97,10 +97,10 @@ export default function CitizenDashboard() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex w-full min-w-0">
         <Sidebar role="CITIZEN" />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 min-w-0">
           {/* Header Banner */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
@@ -196,7 +196,8 @@ export default function CitizenDashboard() {
             </div>
 
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                <CardSkeleton />
                 <CardSkeleton />
                 <CardSkeleton />
               </div>
@@ -210,7 +211,7 @@ export default function CitizenDashboard() {
                 onAction={() => setIsCreateOpen(true)}
               />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {activeRequests.map((req) => (
                   <RequestCard
                     key={req.id}
@@ -242,7 +243,7 @@ export default function CitizenDashboard() {
                 No past resolved requests recorded under your profile.
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {resolvedRequests.map((req) => (
                   <RequestCard key={req.id} request={req} role="CITIZEN" />
                 ))}

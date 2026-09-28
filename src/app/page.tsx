@@ -23,6 +23,7 @@ import {
   FileCheck,
   ChevronDown,
   HelpCircle,
+  Truck,
 } from "lucide-react";
 import { EmergencyRequestData } from "@/types";
 
@@ -103,6 +104,34 @@ export default function LandingPage() {
                   >
                     Become a Volunteer
                   </Button>
+                </Link>
+              </div>
+
+              {/* HACKATHON EVALUATION QUICK ACCESS */}
+              <div className="mt-8 pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-3">
+                <span className="text-xs font-semibold text-slate-400">
+                  Hackathon Evaluation Portals:
+                </span>
+                <Link
+                  href="/citizen"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                >
+                  <Users className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Citizen (Sarah)</span>
+                </Link>
+                <Link
+                  href="/volunteer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                >
+                  <Truck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Volunteer (Alex)</span>
+                </Link>
+                <Link
+                  href="/admin"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                >
+                  <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Command Center (Marcus)</span>
                 </Link>
               </div>
             </div>

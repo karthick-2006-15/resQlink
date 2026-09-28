@@ -25,10 +25,10 @@ export default function CitizenMapPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex w-full min-w-0">
         <Sidebar role="CITIZEN" />
 
-        <main className="flex-1 p-4 sm:p-6 pb-20 md:pb-8">
+        <main className="flex-1 p-4 sm:p-6 pb-20 md:pb-8 min-w-0">
           <div className="mb-4">
             <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
               <Radio className="w-6 h-6 text-red-600 animate-pulse" />

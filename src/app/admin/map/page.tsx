@@ -36,10 +36,10 @@ export default function AdminMapPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex w-full min-w-0">
         <Sidebar role="ADMIN" />
 
-        <main className="flex-1 p-4 sm:p-6 pb-20 md:pb-8">
+        <main className="flex-1 p-4 sm:p-6 pb-20 md:pb-8 min-w-0">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">

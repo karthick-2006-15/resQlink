@@ -80,10 +80,10 @@ export default function CitizenRequestsPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex w-full min-w-0">
         <Sidebar role="CITIZEN" />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-black text-slate-900 tracking-tight">
@@ -137,7 +137,7 @@ export default function CitizenRequestsPage() {
 
           {/* Requests Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
               <CardSkeleton />
               <CardSkeleton />
               <CardSkeleton />
@@ -150,7 +150,7 @@ export default function CitizenRequestsPage() {
               description="Try adjusting your status filter or search query to find previous emergency records."
             />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
               {filtered.map((req) => (
                 <RequestCard
                   key={req.id}

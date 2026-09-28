@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { PriorityBadge, ResourceBadge, StatusBadge } from "../ui/Badge";
 import { Button } from "../ui/Button";
-import { Users, MapPin, Clock, ArrowRight, ShieldCheck, CheckCircle2, Pencil, Trash2 } from "lucide-react";
+import { Users, MapPin, Clock, ArrowRight, ShieldCheck, CheckCircle2, Pencil, Trash2, Cpu } from "lucide-react";
 import { EmergencyRequestData } from "@/types";
+import { PriorityRationaleModal } from "./PriorityRationaleModal";
 
 interface RequestCardProps {
   request: EmergencyRequestData;
@@ -29,24 +30,35 @@ export function RequestCard({
   onDelete,
   isAccepting = false,
 }: RequestCardProps) {
+  const [showRationale, setShowRationale] = useState(false);
   const isCritical = request.priorityLevel === "CRITICAL" && request.status !== "CLOSED";
 
   return (
-    <div
-      className={`relative bg-white rounded-2xl border transition-all duration-200 p-5 shadow-sm hover:shadow-md ${
-        isCritical
-          ? "border-rose-300 ring-1 ring-rose-200/60 bg-rose-50/20"
-          : "border-slate-200/90 hover:border-slate-300"
-      }`}
-    >
-      {/* Top Header: Resource & Status Badges */}
-      <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <ResourceBadge type={request.resourceType} />
-          <PriorityBadge level={request.priorityLevel} />
+    <>
+      <div
+        className={`relative bg-white rounded-2xl border transition-all duration-200 p-5 shadow-sm hover:shadow-md ${
+          isCritical
+            ? "border-rose-300 ring-1 ring-rose-200/60 bg-rose-50/20"
+            : "border-slate-200/90 hover:border-slate-300"
+        }`}
+      >
+        {/* Top Header: Resource & Status Badges */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <ResourceBadge type={request.resourceType} />
+            <PriorityBadge level={request.priorityLevel} />
+            <button
+              type="button"
+              onClick={() => setShowRationale(true)}
+              title="Click to view algorithmic priority calculation breakdown"
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 border border-slate-200/80 transition-colors cursor-pointer"
+            >
+              <Cpu className="w-3 h-3 text-slate-500" />
+              <span>{Math.round(request.priorityScore)} pts</span>
+            </button>
+          </div>
+          <StatusBadge status={request.status} />
         </div>
-        <StatusBadge status={request.status} />
-      </div>
 
       {/* Title & Quantity */}
       <div className="mb-2.5">
@@ -183,5 +195,14 @@ export function RequestCard({
         )}
       </div>
     </div>
+
+    {showRationale && (
+      <PriorityRationaleModal
+        isOpen={showRationale}
+        onClose={() => setShowRationale(false)}
+        request={request}
+      />
+    )}
+  </>
   );
 }

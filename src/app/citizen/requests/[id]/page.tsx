@@ -26,11 +26,15 @@ import {
   Radio,
   Pencil,
   Trash2,
+  Cpu,
+  BarChart2,
 } from "lucide-react";
 import { EmergencyRequestData, AuditLogData } from "@/types";
 import { toast } from "sonner";
 import { CardSkeleton, Skeleton } from "@/components/ui/Skeleton";
 import { EditRequestModal } from "@/components/requests/EditRequestModal";
+import { PriorityRationaleModal } from "@/components/requests/PriorityRationaleModal";
+import { PriorityService } from "@/lib/services/priority.service";
 
 export default function RequestTrackingPage() {
   const params = useParams();
@@ -45,6 +49,7 @@ export default function RequestTrackingPage() {
   const [isCopied, setIsCopied] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRationaleOpen, setIsRationaleOpen] = useState(false);
 
   const handleDeleteRequest = async () => {
     const confirmed = window.confirm("Are you sure you want to permanently delete this emergency request? Any assigned volunteers will be unassigned.");
@@ -315,7 +320,16 @@ export default function RequestTrackingPage() {
 
             <div className="p-3 bg-slate-50 rounded-xl">
               <span className="text-slate-400 block mb-0.5">Priority Urgency</span>
-              <span className="font-bold text-slate-900 text-sm">{request.urgency} ({request.priorityScore} pts)</span>
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-bold text-slate-900 text-sm">{request.urgency} ({request.priorityScore} pts)</span>
+                <button
+                  type="button"
+                  onClick={() => setIsRationaleOpen(true)}
+                  className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline ml-auto"
+                >
+                  View Rationale
+                </button>
+              </div>
             </div>
 
             <div className="p-3 bg-slate-50 rounded-xl">
@@ -426,6 +440,49 @@ export default function RequestTrackingPage() {
               )}
             </div>
 
+            {/* Algorithmic Priority Breakdown Card */}
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <Cpu className="w-4 h-4 text-blue-600" />
+                  <span>Priority Intelligence</span>
+                </h3>
+                <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                  {Math.round(request.priorityScore)}/100
+                </span>
+              </div>
+
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>Urgency Severity ({request.urgency}):</span>
+                  <span className="font-bold text-slate-900">
+                    +{PriorityService.calculate({ urgency: request.urgency, peopleAffected: request.peopleAffected, resourceType: request.resourceType }).breakdown.urgencyScore} pts
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>Affected Scale ({request.peopleAffected} people):</span>
+                  <span className="font-bold text-slate-900">
+                    +{PriorityService.calculate({ urgency: request.urgency, peopleAffected: request.peopleAffected, resourceType: request.resourceType }).breakdown.peopleScore} pts
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>Resource Criticality ({request.resourceType}):</span>
+                  <span className="font-bold text-slate-900">
+                    +{PriorityService.calculate({ urgency: request.urgency, peopleAffected: request.peopleAffected, resourceType: request.resourceType }).breakdown.resourceScore} pts
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsRationaleOpen(true)}
+                className="mt-4 w-full py-2 px-3 text-center text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors border border-blue-200/80 flex items-center justify-center gap-1.5"
+              >
+                <BarChart2 className="w-3.5 h-3.5" />
+                <span>Explain Full Scoring Model</span>
+              </button>
+            </div>
+
             {/* Audit History Box */}
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
@@ -468,6 +525,15 @@ export default function RequestTrackingPage() {
         quantity={request.quantity}
         onSuccess={fetchDetails}
       />
+
+      {/* Priority Rationale Modal */}
+      {isRationaleOpen && (
+        <PriorityRationaleModal
+          isOpen={isRationaleOpen}
+          onClose={() => setIsRationaleOpen(false)}
+          request={request}
+        />
+      )}
     </div>
   );
 }

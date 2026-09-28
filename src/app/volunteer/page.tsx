@@ -130,10 +130,10 @@ export default function VolunteerDashboard() {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Navbar />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex w-full min-w-0">
         <Sidebar role="VOLUNTEER" />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 min-w-0">
           {/* Top Status & Availability Header */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
